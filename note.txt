@@ -1,0 +1,2 @@
+﻿--create db-first entity
+Scaffold-DbContext "Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models/DB
