@@ -1,2 +1,2 @@
-﻿--create db-first entity
+﻿#create db-first entity add -force to reupdate 
 Scaffold-DbContext "Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models/DB

@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using ReactSupply.Models.DTO;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ReactSupply.Interface
 {
@@ -7,5 +9,6 @@ namespace ReactSupply.Interface
         Task<string> SelectAll();
         Task<string> SelectVisibleOnly();
         Task<string> SelectSimpleVisibleOnly();
+        Task<List<ReactDataFormatter>> TableFormatter();
     }
 }

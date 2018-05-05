@@ -11,11 +11,6 @@ namespace ReactSupply.Models.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-//            if (!optionsBuilder.IsConfigured)
-//            {
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-//                optionsBuilder.UseSqlServer(@"Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=True;");
-//            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,12 +30,6 @@ namespace ReactSupply.Models.DB
                     .IsUnicode(false)
                     .HasDefaultValueSql("('text')");
 
-                entity.Property(e => e.CreatedBy)
-                    .HasMaxLength(30)
-                    .HasDefaultValueSql("(suser_name())");
-
-                entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
-
                 entity.Property(e => e.Css).IsUnicode(false);
 
                 entity.Property(e => e.DefaultText).HasMaxLength(1000);
@@ -49,25 +38,32 @@ namespace ReactSupply.Models.DB
 
                 entity.Property(e => e.DisplayName).HasMaxLength(100);
 
+                entity.Property(e => e.Editor)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FilterRenderer)
+                    .HasColumnName("filterRenderer")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Formatter)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Group).HasMaxLength(100);
+
+                entity.Property(e => e.HeaderRenderer)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
-                entity.Property(e => e.IsDisplay).HasDefaultValueSql("((1))");
-
-                entity.Property(e => e.IsEnabled).HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.MaxLength).HasDefaultValueSql("((2000))");
 
                 entity.Property(e => e.MinLength).HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.ModifiedBy)
-                    .HasMaxLength(30)
-                    .HasDefaultValueSql("(suser_name())");
-
-                entity.Property(e => e.ModifiedDate).HasDefaultValueSql("(getdate())");
-
                 entity.Property(e => e.Position).HasColumnType("decimal(4, 2)");
-
-                entity.Property(e => e.TabGroup).HasMaxLength(100);
 
                 entity.Property(e => e.Width).HasDefaultValueSql("((6))");
             });

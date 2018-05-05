@@ -1,65 +1,25 @@
 ﻿import React, { Component } from 'react';
 import ReactDataGrid from 'react-data-grid';
+import update from 'immutability-helper';
+import ErrorBoundary from '../error/ErrorBoundary';
+const { Toolbar, Editors, Formatters, Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 
 export default class Home extends Component {
     displayName = Home.name
 
-    //constructor(props) {
-    //    super(props);
-    //    this.state = { forecasts: [], loading: true };
-
-    //    fetch('api/Home/GetSimpleConfigurationMain')
-    //        .then(response => response.json())
-    //        .then(data => {
-    //            console.log(data);
-    //            this.setState({ forecasts: data, loading: false });
-    //        });
-
-
-
-    //}
-
     constructor(props, context) {
         super(props, context);
-        this._columns = [
-            {
-                key: 'id',
-                name: 'ID',
-                width: 80
-            },
-            {
-                key: 'task',
-                name: 'Title',
-                editable: true
-            },
-            {
-                key: 'priority',
-                name: 'Priority',
-                editable: true
-            },
-            {
-                key: 'issueType',
-                name: 'Issue Type',
-                editable: true
-            },
-            {
-                key: 'complete',
-                name: '% Complete',
-                editable: true
-            },
-            {
-                key: 'startDate',
-                name: 'Start Date',
-                editable: true
-            },
-            {
-                key: 'completeDate',
-                name: 'Expected Complete',
-                editable: true
-            }
-        ];
 
-        this.state = { rows: this.createRows(1000) };
+        let originalRows = this.createRows(1000);
+        this.state = { rows: this.createRows(1000), filters: {}, sortColumn: null, sortDirection: null };
+    }
+
+    componentDidMount() {
+        fetch('api/Home/GetConfigurationMainJson')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ _columns: JSON.parse(data), loading: false });
+            });
     }
 
     getRandomDate = (start, end) => {
@@ -70,42 +30,123 @@ export default class Home extends Component {
         let rows = [];
         for (let i = 1; i < numberOfRows; i++) {
             rows.push({
-                id: i,
-                task: 'Task ' + i,
-                complete: Math.min(100, Math.round(Math.random() * 110)),
+                No: i,
+                PO: 'Task ' + i,
+                AX6SO: Math.min(100, Math.round(Math.random() * 110)),
                 priority: ['Critical', 'High', 'Medium', 'Low'][Math.floor((Math.random() * 3) + 1)],
-                issueType: ['Bug', 'Improvement', 'Epic', 'Story'][Math.floor((Math.random() * 3) + 1)],
-                startDate: this.getRandomDate(new Date(2015, 3, 1), new Date()),
-                completeDate: this.getRandomDate(new Date(), new Date(2016, 0, 1))
+                ProductType: ['Bug', 'Improvement', 'Epic', 'Story'][Math.floor((Math.random() * 3) + 1)],
+                SoReceivedDate: this.getRandomDate(new Date(2015, 3, 1), new Date()),
+                SoIssuedDate: this.getRandomDate(new Date(), new Date(2016, 0, 1))
             });
         }
         return rows;
     };
 
-    rowGetter = (i) => {
-        return this.state.rows[i];
+    rowGetter = (rowIdx) => {
+        let rows = this.getRows();
+        return rows[rowIdx];
     };
+
 
     handleGridRowsUpdated = ({ fromRow, toRow, updated }) => {
         let rows = this.state.rows.slice();
 
         for (let i = fromRow; i <= toRow; i++) {
             let rowToUpdate = rows[i];
-            let updatedRow = "" // update(rowToUpdate, { $merge: updated });
+            let updatedRow = update(rowToUpdate, { $merge: updated });
             rows[i] = updatedRow;
         }
 
         this.setState({ rows });
     };
 
+    handleGridSort = (sortColumn, sortDirection) => {
+        this.setState({ sortColumn: sortColumn, sortDirection: sortDirection });
+    };
+
+    handleFilterChange = (filter) => {
+        let newFilters = Object.assign({}, this.state.filters);
+        if (filter.filterTerm) {
+            newFilters[filter.column.key] = filter;
+        } else {
+            delete newFilters[filter.column.key];
+        }
+        this.setState({ filters: newFilters });
+    };
+
+    onClearFilters = () => {
+        this.setState({ filters: {} });
+    };
+
+    getRows = () => {
+        return Selectors.getRows(this.state);
+    };
+
+    getSize = () => {
+        return this.getRows().length;
+    };
+
+    getValidFilterValues = (columnId) => {
+        let values = this.state.rows.map(r => r[columnId]);
+        return values.filter((item, i, a) => { return i === a.indexOf(item); });
+    };
+
+    renderStringToFilter = (apiData) => {
+        for (var i = 0; i <= apiData.length - 1; i++) {
+            var s = apiData[i];
+
+            if (s.filterRenderer !== undefined) {
+                if (s.filterRenderer === "MultiSelectFilter") {
+                    s.filterRenderer = MultiSelectFilter;
+                }
+                else if (s.filterRenderer === "NumericFilter") {
+                    s.filterRenderer = NumericFilter;
+                }
+                else if (s.filterRenderer === "AutoCompleteFilter") {
+                    s.filterRenderer = AutoCompleteFilter;
+                }
+                else if (s.filterRenderer === "SingleSelectFilter") {
+                    s.filterRenderer = SingleSelectFilter;
+                }
+            }
+        }
+
+        return apiData;
+    };
+
     render() {
-        return (
-            <ReactDataGrid
-                enableCellSelect={true}
-                columns={this._columns}
-                rowGetter={this.rowGetter}
-                rowsCount={this.state.rows.length}
-                minHeight={500}
-                onGridRowsUpdated={this.handleGridRowsUpdated} />);
+        let apiData = this.state._columns;
+        let total
+        if (apiData !== undefined) {
+            apiData = this.renderStringToFilter(apiData);
+            return (
+                <div>
+                    <ErrorBoundary>
+                        <ReactDataGrid
+                            onGridSort={this.handleGridSort}
+                            enableCellSelect={true}
+                            columns={apiData}
+                            rowGetter={this.rowGetter}
+                            rowsCount={this.getSize()}
+                            minHeight={600}
+                            cellNavigationMode="changeRow"
+                            onGridRowsUpdated={this.handleGridRowsUpdated}
+                            toolbar={<Toolbar enableFilter={true} />}
+                            onAddFilter={this.handleFilterChange}
+                            getValidFilterValues={this.getValidFilterValues}
+                            onClearFilters={this.onClearFilters}
+                            emptyRowsView={EmptyRowsView}/>
+                    </ErrorBoundary>
+                </div>  
+            )
+        }
+        return (<div>Loading....</div>);
+
+    }
+}
+
+class EmptyRowsView extends React.Component {
+    render() {
+        return (<div>Nothing to show</div>);
     }
 }

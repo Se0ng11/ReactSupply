@@ -16,14 +16,18 @@ namespace ReactSupply.Models.DB
         public int? MinLength { get; set; }
         public int? MaxLength { get; set; }
         public int? Width { get; set; }
-        public bool? IsEnabled { get; set; }
-        public bool? IsDisplay { get; set; }
-        public bool? IsRequired { get; set; }
-        public string TabGroup { get; set; }
+        public bool IsLocked { get; set; }
+        public bool IsFilterable { get; set; }
+        public bool IsEditable { get; set; }
+        public bool IsVisible { get; set; }
+        public bool IsRequired { get; set; }
+        public bool IsResizeable { get; set; }
+        public bool IsSortable { get; set; }
+        public string Formatter { get; set; }
+        public string HeaderRenderer { get; set; }
+        public string Editor { get; set; }
+        public string FilterRenderer { get; set; }
+        public string Group { get; set; }
         public string Css { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string ModifiedBy { get; set; }
-        public DateTime? CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
     }
 }

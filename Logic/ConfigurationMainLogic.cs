@@ -27,7 +27,7 @@ namespace ReactSupply.Logic
                 using (var db = _context)
                 {
                     lst = await db.ConfigurationMain
-                        .OrderBy(x => x.TabGroup)
+                        .OrderBy(x => x.Group)
                         .ThenBy(x => x.Position)
                         .ToListAsync().ConfigureAwait(false);
                 }
@@ -49,8 +49,8 @@ namespace ReactSupply.Logic
                 using (var db = _context)
                 {
                     lst = await db.ConfigurationMain
-                        .Where(x => x.IsDisplay == true)
-                        .OrderBy(x => x.TabGroup)
+                        .Where(x => x.IsVisible == true)
+                        .OrderBy(x => x.Group)
                         .ThenBy(x => x.Position)
                         .Select(x => new ConfigurationMainDTO
                         {
@@ -58,7 +58,7 @@ namespace ReactSupply.Logic
                             ControlType = x.ControlType,
                             Position = x.Position,
 
-                            TabGroup = x.TabGroup,
+                            Group = x.Group,
                             Css = x.Css
                         })
                         .ToListAsync().ConfigureAwait(false);
@@ -81,8 +81,8 @@ namespace ReactSupply.Logic
                 using (var db = _context)
                 {
                     lst = await db.ConfigurationMain
-                        .Where(x => x.IsDisplay == true)
-                        .OrderBy(x => x.TabGroup)
+                        .Where(x => x.IsVisible == true)
+                        .OrderBy(x => x.Group)
                         .ThenBy(x => x.Position)
                         .ToListAsync().ConfigureAwait(false);
                 }
@@ -104,8 +104,8 @@ namespace ReactSupply.Logic
                 using (var db = _context)
                 {
                     lst = await db.ConfigurationMain
-                        .Where(x => x.IsDisplay == true)
-                        .OrderBy(x => x.TabGroup)
+                        .Where(x => x.IsVisible == true)
+                        .OrderBy(x => x.Group)
                         .ThenBy(x => x.Position)
                         .Select(x => new ConfigurationMainDTO
                         {
@@ -113,7 +113,7 @@ namespace ReactSupply.Logic
                             ControlType = x.ControlType,
                             Position = x.Position,
 
-                            TabGroup = x.TabGroup,
+                            Group = x.Group,
                             Css = x.Css
                         })
                         .ToListAsync().ConfigureAwait(false);
@@ -125,6 +125,88 @@ namespace ReactSupply.Logic
             }
 
             return lst;
+        }
+
+
+
+        public async Task<List<ReactDataFormatter>> TableFormatter()
+        {
+            List<ReactDataFormatter> lst = new List<ReactDataFormatter>();
+
+            try
+            {
+                using (var db = _context)
+                {
+                    lst = await db.ConfigurationMain
+                        .Where(x => x.IsVisible == true)
+                        .OrderBy(x => x.Group)
+                        .ThenBy(x => x.Position)
+                        .Select(x => new ReactDataFormatter
+                        {
+                            key = x.ValueName,
+                            name = x.DisplayName,
+                            width = Convert.ToInt32(x.Width),
+                            locked = x.IsLocked,
+                            sortable = x.IsSortable,
+                            editable = x.IsEditable,
+                            filterable = x.IsFilterable,
+                            resizable = x.IsResizeable,
+                            cellClass = x.Css,
+                            formatter = x.Formatter,
+                            headerRenderer = x.HeaderRenderer,
+                            editor = x.Editor,
+                            filterRenderer = x.FilterRenderer
+
+                        })
+                        .ToListAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return lst;
+        }
+
+        public async Task<string> TableFormatterJson()
+        {
+            List<ReactDataFormatter> lst = new List<ReactDataFormatter>();
+
+            try
+            {
+                using (var db = _context)
+                {
+                    lst = await db.ConfigurationMain
+                        .Where(x => x.IsVisible == true)
+                        .OrderBy(x => x.Group)
+                        .ThenBy(x => x.Position)
+                        .Select(x => new ReactDataFormatter
+                        {
+                            key = x.ValueName,
+                            name = x.DisplayName,
+                            width = Convert.ToInt32(x.Width),
+                            locked = x.IsLocked,
+                            sortable = x.IsSortable,
+                            editable = x.IsEditable,
+                            filterable = x.IsFilterable,
+                            resizable = x.IsResizeable,
+                            cellClass = x.Css,
+                            formatter = x.Formatter,
+                            headerRenderer = x.HeaderRenderer,
+                            editor = x.Editor,
+                            filterRenderer = x.FilterRenderer
+
+                        })
+                        .ToListAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return ConvertToJSON(lst);
         }
     }
 }
