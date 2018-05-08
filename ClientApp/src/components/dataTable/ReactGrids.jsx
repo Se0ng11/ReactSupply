@@ -2,10 +2,10 @@
 import ReactDataGrid from 'react-data-grid';
 import update from 'immutability-helper';
 import ErrorBoundary from '../error/ErrorBoundary';
-const { Toolbar, Editors, Formatters, Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter }, Data: { Selectors } } = require('react-data-grid-addons');
+const { Toolbar, Editors, Formatters, Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 
-export default class Home extends Component {
-    displayName = Home.name
+export default class ReactGrids extends Component {
+    displayName = ReactGrids.name
 
     constructor(props, context) {
         super(props, context);
@@ -15,10 +15,10 @@ export default class Home extends Component {
     }
 
     componentDidMount() {
-        fetch('api/Home/GetConfigurationMainJson')
+        fetch(this.props.api)
             .then(response => response.json())
             .then(data => {
-                this.setState({ _columns: JSON.parse(data), loading: false });
+                this.setState({ _columns: JSON.parse(data) });
             });
     }
 
@@ -108,11 +108,19 @@ export default class Home extends Component {
                 else if (s.filterRenderer === "SingleSelectFilter") {
                     s.filterRenderer = SingleSelectFilter;
                 }
+                else if (s.filterRenderer === "DateFilter") {
+                    s.filterRenderer = DateFilter;
+                }
             }
         }
 
         return apiData;
     };
+
+    renderStringToEditor = (apiData) => {
+
+
+    }
 
     render() {
         let apiData = this.state._columns;

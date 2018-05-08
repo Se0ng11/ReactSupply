@@ -1,8 +1,5 @@
 ﻿import React, { Component } from 'react';
-import {
-    Navbar,
-    Nav
-} from 'react-bootstrap';
+import { Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import '../menu/top.css';
 
@@ -13,13 +10,14 @@ export default class Top extends Component {
             <Navbar fluid collapseOnSelect fixedTop className="shadow">
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <Link to="/Home">Hartalega</Link>
+                        <Link to="/Home">Sample</Link>
                     </Navbar.Brand>
                     <Navbar.Toggle />
                 </Navbar.Header>
                 <Navbar.Collapse>
                     <Nav>
-
+                        <li><Link to='/Home'><i className="fa fa-home"></i> React Grid</Link></li>
+                        <li><Link to='/reacttable'><i className="fa fa-users"></i> React Table</Link></li>
                     </Nav>
                     <Navbar.Form pullRight>
                         <Link className="btn btn-danger btn-block" to='/'>Sign Out <i className="fa fa-sign-out"></i></Link>
