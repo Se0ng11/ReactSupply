@@ -28,6 +28,7 @@ namespace ReactSupply.Models.DB
         public string Editor { get; set; }
         public string FilterRenderer { get; set; }
         public string Group { get; set; }
-        public string Css { get; set; }
+        public string HeaderCss { get; set; }
+        public string BodyCss { get; set; }
     }
 }

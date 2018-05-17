@@ -11,6 +11,10 @@ namespace ReactSupply.Models.DB
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (!optionsBuilder.IsConfigured)
+            {
+
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,12 +29,12 @@ namespace ReactSupply.Models.DB
 
                 entity.Property(e => e.ValueName).HasMaxLength(50);
 
+                entity.Property(e => e.BodyCss).IsUnicode(false);
+
                 entity.Property(e => e.ControlType)
                     .HasMaxLength(10)
                     .IsUnicode(false)
                     .HasDefaultValueSql("('text')");
-
-                entity.Property(e => e.Css).IsUnicode(false);
 
                 entity.Property(e => e.DefaultText).HasMaxLength(1000);
 
@@ -43,7 +47,6 @@ namespace ReactSupply.Models.DB
                     .IsUnicode(false);
 
                 entity.Property(e => e.FilterRenderer)
-                    .HasColumnName("filterRenderer")
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
@@ -52,6 +55,8 @@ namespace ReactSupply.Models.DB
                     .IsUnicode(false);
 
                 entity.Property(e => e.Group).HasMaxLength(100);
+
+                entity.Property(e => e.HeaderCss).IsUnicode(false);
 
                 entity.Property(e => e.HeaderRenderer)
                     .HasMaxLength(100)
@@ -97,6 +102,10 @@ namespace ReactSupply.Models.DB
                     .HasDefaultValueSql("(suser_name())");
 
                 entity.Property(e => e.ModifiedDate).HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
             });
         }
     }

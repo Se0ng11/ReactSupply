@@ -9,6 +9,7 @@ namespace ReactSupply.Models.DB
         public int ModuleId { get; set; }
         public string ValueName { get; set; }
         public string AxNumber { get; set; }
+        public string Status { get; set; }
         public string Data { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string ModifiedBy { get; set; }

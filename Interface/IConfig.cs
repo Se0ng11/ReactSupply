@@ -1,4 +1,4 @@
-﻿using ReactSupply.Models.DTO;
+﻿using ReactSupply.Models.Entity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,9 +6,10 @@ namespace ReactSupply.Interface
 {
     public interface IConfig
     {
-        Task<string> SelectAll();
-        Task<string> SelectVisibleOnly();
-        Task<string> SelectSimpleVisibleOnly();
-        Task<List<ReactDataFormatter>> TableFormatter();
+        Task<string> SelectAllData();
+
+        Task<string> SelectSchemaHeader();
+
+        Task<string> PostSingleField(string indentifier, string valueName, string data);
     }
 }

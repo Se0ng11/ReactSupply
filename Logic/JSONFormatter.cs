@@ -2,7 +2,7 @@
 
 namespace ReactSupply.Logic
 {
-    public class BaseLogic
+    public class JSONFormatter
     {
         public string ConvertToJSON(object result)
         {

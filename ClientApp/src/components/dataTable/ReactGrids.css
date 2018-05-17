@@ -1,0 +1,51 @@
+﻿.react-grid-HeaderCell, .react-grid-Cell {
+    text-align: center;
+}
+
+.green {
+    background: #2ecc71 !important;
+}
+
+.blue {
+    background: #3498db !important;
+}
+
+.red {
+    background: #e74c3c !important;
+}
+
+.purple {
+    background: #9b59b6 !important;
+}
+
+.yellow {
+    background: #f1c40f !important;
+}
+
+.orange {
+    background: #f39c12 !important;
+}
+
+.grey {
+    background: #95a5a6 !important;
+}
+
+.silver {
+    background: #bdc3c7 !important;
+}
+
+.cloud {
+    background: #ecf0f1 !important;
+}
+
+.border-success {
+    border: 1px solid green;
+}
+
+.border-failed {
+    border: 1px solid red;
+}
+
+.border-progress {
+    border: 1px solid yellow;
+}

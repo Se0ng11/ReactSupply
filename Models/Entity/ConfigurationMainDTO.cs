@@ -1,4 +1,4 @@
-﻿namespace ReactSupply.Models.DTO
+﻿namespace ReactSupply.Models.Entity
 {
     public class ConfigurationMainDTO
     {

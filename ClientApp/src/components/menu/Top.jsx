@@ -1,6 +1,7 @@
 ﻿import React, { Component } from 'react';
-import { Navbar, Nav } from 'react-bootstrap';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { LinkContainer } from 'react-router-bootstrap';
 import '../menu/top.css';
 
 export default class Top extends Component {
@@ -16,8 +17,26 @@ export default class Top extends Component {
                 </Navbar.Header>
                 <Navbar.Collapse>
                     <Nav>
-                        <li><Link to='/Home'><i className="fa fa-home"></i> React Grid</Link></li>
-                        <li><Link to='/reacttable'><i className="fa fa-users"></i> React Table</Link></li>
+                        <LinkContainer to={'/Home'}>
+                            <NavItem>
+                                <i className="fa fa-home"></i> React Grid
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/reacttable'}>
+                            <NavItem>
+                                <i className="fa fa-table"></i> Logs
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/reacttable'}>
+                            <NavItem>
+                                <i className="fa fa-line-chart"></i> Reports
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/config'}>
+                            <NavItem>
+                                <i className="fa fa-tasks"></i> Configuration
+                            </NavItem>
+                        </LinkContainer>
                     </Nav>
                     <Navbar.Form pullRight>
                         <Link className="btn btn-danger btn-block" to='/'>Sign Out <i className="fa fa-sign-out"></i></Link>

@@ -7,7 +7,10 @@ export class ReactGridSample extends Component {
     render() {
         return (
             <Home>
-                <ReactGrids api="api/Home/GetConfigurationMainJson" />
+                <ReactGrids
+                    getApi="api/Home/GetSupplyRecord"
+                    postApi="api/Home/PostSingleSupplyRecordField"
+                    isBasic={false} />
             </Home>
         );
     }
