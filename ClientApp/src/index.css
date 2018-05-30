@@ -1,9 +1,53 @@
-@media (max-width: 767px) {
-    /* On small screens, the nav menu spans the full width of the screen. Leave a space for it. */
-    body {
-        margin-top: 50px;
-    }
+html{
+    height: 100%;
 }
+
 body {
-    margin-top: 100px;
+    padding-top: 100px;
+}
+
+
+
+.main-theme {
+}
+
+
+.fadeTranslate-enter {
+    transform: translate(100%);
+}
+
+    .fadeTranslate-enter.fadeTranslate-enter-active {
+        transform: translate(0%);
+        transition: transform 300ms ease-in-out;
+    }
+
+.fadeTranslate-exit {
+    transform: translate(0%);
+}
+
+    .fadeTranslate-exit.fadeTranslate-exit-active {
+        transform: translate(-100%);
+        transition: transform 300ms ease-in-out;
+    }
+
+.fix-container {
+    position: fixed;
+}
+
+
+
+.fo-red {
+    color:red;
+}
+
+.fo-blue {
+    color: blue;
+}
+
+.fo-green {
+    color: green;
+}
+
+.fo-yellow {
+    color: yellow;
 }

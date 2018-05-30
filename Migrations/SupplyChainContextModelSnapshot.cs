@@ -30,13 +30,13 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
+                    b.Property<string>("BodyCss")
+                        .IsUnicode(false);
+
                     b.Property<string>("ControlType")
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("('text')")
                         .HasMaxLength(10)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Css")
                         .IsUnicode(false);
 
                     b.Property<string>("DefaultText")
@@ -53,7 +53,6 @@ namespace ReactSupply.Migrations
                         .IsUnicode(false);
 
                     b.Property<string>("FilterRenderer")
-                        .HasColumnName("filterRenderer")
                         .HasMaxLength(100)
                         .IsUnicode(false);
 
@@ -63,6 +62,9 @@ namespace ReactSupply.Migrations
 
                     b.Property<string>("Group")
                         .HasMaxLength(100);
+
+                    b.Property<string>("HeaderCss")
+                        .IsUnicode(false);
 
                     b.Property<string>("HeaderRenderer")
                         .HasMaxLength(100)
@@ -105,6 +107,56 @@ namespace ReactSupply.Migrations
                     b.ToTable("ConfigurationMain");
                 });
 
+            modelBuilder.Entity("ReactSupply.Models.DB.Menu", b =>
+                {
+                    b.Property<string>("MenuCode")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20);
+
+                    b.Property<bool>("IsEnabled");
+
+                    b.Property<string>("MenuClass");
+
+                    b.Property<string>("MenuName")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("Url");
+
+                    b.HasKey("MenuCode");
+
+                    b.ToTable("Menu");
+                });
+
+            modelBuilder.Entity("ReactSupply.Models.DB.SubMenu", b =>
+                {
+                    b.Property<string>("SubCode")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20);
+
+                    b.Property<string>("IsEnabled");
+
+                    b.Property<string>("MenuCode")
+                        .IsRequired()
+                        .HasMaxLength(20);
+
+                    b.Property<decimal>("Position");
+
+                    b.Property<string>("SubClass");
+
+                    b.Property<string>("SubName")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("SubParent");
+
+                    b.Property<string>("Url");
+
+                    b.HasKey("SubCode");
+
+                    b.HasIndex("MenuCode");
+
+                    b.ToTable("SubMenu");
+                });
+
             modelBuilder.Entity("ReactSupply.Models.DB.SupplyRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -143,9 +195,32 @@ namespace ReactSupply.Migrations
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("(getdate())");
 
+                    b.Property<string>("Status")
+                        .HasMaxLength(10)
+                        .IsUnicode(false);
+
                     b.HasKey("Id", "ModuleId", "ValueName");
 
                     b.ToTable("SupplyRecord");
+                });
+
+            modelBuilder.Entity("ReactSupply.Models.Entity.JSONResult", b =>
+                {
+                    b.Property<string>("JsonResult")
+                        .ValueGeneratedOnAdd();
+
+                    b.HasKey("JsonResult");
+
+                    b.ToTable("JSONResult");
+                });
+
+            modelBuilder.Entity("ReactSupply.Models.DB.SubMenu", b =>
+                {
+                    b.HasOne("ReactSupply.Models.DB.Menu", "Menu")
+                        .WithMany("SubMenus")
+                        .HasForeignKey("MenuCode")
+                        .HasConstraintName("ForeignKey_Menu_SubMenu")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

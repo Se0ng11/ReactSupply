@@ -6,10 +6,10 @@ namespace ReactSupply.Interface
 {
     public interface IConfig
     {
-        Task<string> SelectAllData();
+        Task<string> SelectAllDataAsync();
 
-        Task<string> SelectSchemaHeader();
+        string SelectSchemaHeaderSync();
 
-        Task<string> PostSingleField(string indentifier, string valueName, string data);
+        Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data);
     }
 }

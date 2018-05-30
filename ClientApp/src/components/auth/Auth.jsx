@@ -4,7 +4,13 @@ import { Link } from "react-router-dom";
 import { Layout } from '../Layout';
 
 export default class Auth extends Component {
+
+    onSignIn = () => {
+        localStorage.setItem("currentMenu", 0);
+    }
+
     render() {
+        localStorage.clear();
         return (
             <Layout>
                 <form className="form-signin">
@@ -13,7 +19,7 @@ export default class Auth extends Component {
                     <input type="email" id="inputEmail" className="form-control" placeholder="Sample ID" />
                     <label className="sr-only">Password</label>
                     <input type="password" id="inputPassword" className="form-control" placeholder="Password" />
-                    <Link className="btn btn-lg btn-primary btn-block" to='/home' >Sign In <i className="fa fa-sign-in"></i></Link>
+                    <Link className="btn btn-lg btn-primary btn-block" to='/home' onClick={()=>this.onSignIn()}>Sign In <i className="fa fa-sign-in"></i></Link>
                 </form>
             </Layout>
         );

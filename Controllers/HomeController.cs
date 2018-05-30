@@ -7,57 +7,47 @@ using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
 using System.Threading.Tasks;
 
-
 namespace ReactSupply.Controllers
 {
     [Produces("application/json")]
     [Route("api/Home")]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly SupplyChainContext _configuration;
-
-        public HomeController(SupplyChainContext configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public HomeController(SupplyChainContext context) => _context = context;
 
         [HttpGet("[action]")]
         public JsonResult GetSupplyRecord()
         {
-            var obj = new ConfigurationMainLogic(_configuration);
-            var obj1 = new SupplyRecordLogic(_configuration);
+            var obj = new ConfigurationMainLogic(_context);
+            var obj1 = new SupplyRecordLogic(_context);
             var data = obj.SelectHeader();
-            var data1 = obj1.SelectAllData();
+            var data1 = obj1.SelectAllDataAsync();
 
-            Task.WaitAll(data, data1);
+            Task.WhenAll(data, data1);
 
-            var result = new { header = data.Result, body = data1.Result };
+            var result = new TableFormatter { Header = data.Result, Body = data1.Result };
             return FormatJSON(result);
         }
 
         [HttpGet("[action]")]
-        public string GetConfiguration()
+        public JsonResult GetConfiguration()
         {
-            var obj = new ConfigurationMainLogic(_configuration);
-            var data = obj.SelectAllData();
+            var obj = new ConfigurationMainLogic(_context);
+            var data = obj.SelectSchemaHeaderSync();
+            var data1 = obj.SelectAllDataAsync();
 
-            
+            Task.WaitAll(data1);
 
-            Task.WaitAll(data);
+            var result = new TableFormatter { Header = data, Body = data1.Result };
 
-            return data.Result;
+            return FormatJSON(result);
         }
 
 
         [HttpPut("[action]")]
         public string PostSingleSupplyRecordField([FromBody]RequestData requestData)
         {
-            var obj = new SupplyRecordLogic(_configuration);
+            var obj = new SupplyRecordLogic(_context);
             return PostData(requestData, obj);
         }
 
@@ -65,7 +55,7 @@ namespace ReactSupply.Controllers
         [HttpPut("[action]")]
         public string PostSingleConfigurationField([FromBody]RequestData requestData)
         {
-            var obj = new ConfigurationMainLogic(_configuration);
+            var obj = new ConfigurationMainLogic(_context);
             return PostData(requestData, obj);
         }
         
@@ -75,18 +65,14 @@ namespace ReactSupply.Controllers
             var keyName = ((JObject)s).First.Path;
             var valueName = ((JObject)s).First.Last.ToString();
 
-            var result = config.PostSingleField(requestData.identifier, keyName, valueName);
+            var result = config.PostSingleFieldAsync(requestData.identifier, keyName, valueName);
 
             Task.WaitAll(result);
 
             return result.Result;
         }
 
-
-        private JsonResult FormatJSON(object result)
-        {
-            return Json(JsonConvert.SerializeObject(result, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
-        }
+      
 
     }
 }

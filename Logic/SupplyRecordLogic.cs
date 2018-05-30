@@ -1,21 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
+using ReactSupply.Models.Entity;
 using System;
 using System.Threading.Tasks;
 
 namespace ReactSupply.Logic
 {
-    public class SupplyRecordLogic: JSONFormatter, IConfig
+    public class SupplyRecordLogic: BaseLogic, IConfig
     {
-        private readonly SupplyChainContext _context;
-        public SupplyRecordLogic(SupplyChainContext context)
-        {
-            _context = context;
+        public SupplyRecordLogic(SupplyChainContext context) => _context = context;
 
-        }
-
-        public async Task<string> SelectAllData()
+        public async Task<string> SelectAllDataAsync()
         {
             JSONResult lst = new JSONResult();
 
@@ -35,7 +31,7 @@ namespace ReactSupply.Logic
             return lst.JsonResult.Replace("\\\\", "");
         }
 
-        public async Task<string> PostSingleField(string indentifier, string valueName, string data)
+        public async Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
         {
             string StatusMessage = "Failed";
 
@@ -69,7 +65,7 @@ namespace ReactSupply.Logic
             return StatusMessage;
         }
 
-        public Task<string> SelectSchemaHeader()
+        public string SelectSchemaHeaderSync()
         {
             throw new NotImplementedException();
         }

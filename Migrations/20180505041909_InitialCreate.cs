@@ -10,23 +10,22 @@ namespace ReactSupply.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "ConfigurationMain",
+                name: "ConfigurationMain",  
                 columns: table => new
                 {
-                    ModuleID = table.Column<int>(nullable: false, defaultValueSql: "((0))"),
-                    ValueName = table.Column<string>(maxLength: 50, nullable: false),
-                    ControlType = table.Column<string>(unicode: false, maxLength: 10, nullable: true, defaultValueSql: "('text')"),
-                    Css = table.Column<string>(unicode: false, nullable: true),
-                    DefaultText = table.Column<string>(maxLength: 1000, nullable: true),
-                    Description = table.Column<string>(maxLength: 1000, nullable: true),
-                    DisplayName = table.Column<string>(maxLength: 100, nullable: true),
-                    Editor = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
-                    filterRenderer = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
-                    Formatter = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
-                    Group = table.Column<string>(maxLength: 100, nullable: true),
-                    HeaderRenderer = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ModuleID = table.Column<int>(nullable: false, defaultValueSql: "((0))"),
+                    ValueName = table.Column<string>(maxLength: 50, nullable: false),
+                    DisplayName = table.Column<string>(maxLength: 100, nullable: true),
+                    ControlType = table.Column<string>(unicode: false, maxLength: 10, nullable: true, defaultValueSql: "('text')"),
+                    DefaultText = table.Column<string>(maxLength: 1000, nullable: true),
+                    Description = table.Column<string>(maxLength: 1000, nullable: true),
+                    MaxLength = table.Column<int>(nullable: true, defaultValueSql: "((2000))"),
+                    MinLength = table.Column<int>(nullable: true, defaultValueSql: "((0))"),
+                    Position = table.Column<decimal>(type: "decimal(4, 2)", nullable: true),
+                    Width = table.Column<int>(nullable: true, defaultValueSql: "((6))"),
+                    Group = table.Column<string>(maxLength: 100, nullable: true),
                     IsEditable = table.Column<bool>(nullable: false),
                     IsFilterable = table.Column<bool>(nullable: false),
                     IsLocked = table.Column<bool>(nullable: false),
@@ -34,10 +33,12 @@ namespace ReactSupply.Migrations
                     IsResizeable = table.Column<bool>(nullable: false),
                     IsSortable = table.Column<bool>(nullable: false),
                     IsVisible = table.Column<bool>(nullable: false),
-                    MaxLength = table.Column<int>(nullable: true, defaultValueSql: "((2000))"),
-                    MinLength = table.Column<int>(nullable: true, defaultValueSql: "((0))"),
-                    Position = table.Column<decimal>(type: "decimal(4, 2)", nullable: true),
-                    Width = table.Column<int>(nullable: true, defaultValueSql: "((6))")
+                    Css = table.Column<string>(unicode: false, nullable: true),
+                    Editor = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    filterRenderer = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    Formatter = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                    HeaderRenderer = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
+                   
                 },
                 constraints: table =>
                 {
@@ -53,9 +54,9 @@ namespace ReactSupply.Migrations
                     ModuleID = table.Column<int>(nullable: false, defaultValueSql: "((0))"),
                     ValueName = table.Column<string>(maxLength: 50, nullable: false),
                     AxNumber = table.Column<string>(maxLength: 20, nullable: false),
+                    Data = table.Column<string>(maxLength: 1000, nullable: true),
                     CreatedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
                     CreatedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())"),
-                    Data = table.Column<string>(maxLength: 1000, nullable: true),
                     ModifiedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
                     ModifiedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())")
                 },

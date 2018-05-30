@@ -2,8 +2,20 @@
     text-align: center;
 }
 
+.react-grid-Row--odd .react-grid-Cell {
+
+}
+
+.react-grid-Row--even .react-grid-Cell {
+
+}
+
+.drag-handle {
+    display: none;
+}
+
 .green {
-    background: #2ecc71 !important;
+    background: #2ecc71 !important; 
 }
 
 .blue {
@@ -34,18 +46,29 @@
     background: #bdc3c7 !important;
 }
 
-.cloud {
+.cloud, .react-grid-Cell--locked, .react-grid-Row--odd .react-grid-Cell {
     background: #ecf0f1 !important;
 }
 
 .border-success {
-    border: 1px solid green;
+    border: 1px solid green !important;
+    box-shadow: 0px 1px 20px -1px inset green;
 }
 
 .border-failed {
-    border: 1px solid red;
+    border: 1px solid red !important;
+    box-shadow: 0px 1px 20px -1px inset red;
 }
 
 .border-progress {
-    border: 1px solid yellow;
+    border: 1px solid yellow !important;
+    box-shadow: 0px 1px 20px -1px inset yellow;
+}
+
+.true { 
+    color: blue;
+}
+
+.false {
+    color: red;
 }

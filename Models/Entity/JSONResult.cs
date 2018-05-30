@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ReactSupply.Models.DB
+namespace ReactSupply.Models.Entity
 {
     public class JSONResult
     {

@@ -1,2 +1,10 @@
-﻿#create db-first entity add -force to reupdate 
+﻿#initial use db first, subsequent use code first approach
+
+#create db-first entity add -force to reupdate 
 Scaffold-DbContext "Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models/DB
+
+#add a new migration
+Add-Migration InitialCreate
+
+#update the new change to database
+Update-Database
