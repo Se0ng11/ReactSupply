@@ -1,0 +1,7 @@
+﻿.warning {
+    position: relative;
+    top: 100px;
+    padding: 20px;
+    text-align:center;
+    user-select:none;
+}

@@ -50,12 +50,12 @@ export default class ReactGrids extends Component {
                 cancel = c;
             })
         }).then((response) => {
-                var data = response.data;
-                var obj = JSON.parse(data);
-                var _header = JSON.parse(obj.Header);
-                var _rows = JSON.parse(obj.Body);
+                let data = response.data;
+                let obj = JSON.parse(data);
+                let _header = JSON.parse(obj.Header);
+                let _rows = JSON.parse(obj.Body);
 
-                for (var i = 0; i <= _rows.length - 1; i++) {
+                for (let i = 0; i <= _rows.length - 1; i++) {
                     _rows[i].No = i + 1;
                 }
 
@@ -70,7 +70,7 @@ export default class ReactGrids extends Component {
     }
 
     componentWillUnmount() {
-        cancel();
+        cancel("User cancel it");
     }
 
     rowGetter = (rowIdx) => {

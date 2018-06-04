@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
-export class Index extends Component {
+
+export class Home extends Component {
 
     render() {
         return (

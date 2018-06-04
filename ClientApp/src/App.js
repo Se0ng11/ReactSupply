@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
-import { ReactGridSample } from './components/sample/SampleList';
-import { Config } from './components/config/Config';
-import { Index } from './components/home/index';
-import Auth from './components/auth/Auth';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Switch } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Layout } from './components/Layout';
+import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuList';
 
 const PageFade = (props) => (
     <CSSTransition
@@ -29,9 +26,11 @@ export default class App extends Component {
                     <PageFade key={locationKey}>
                         <Switch location={this.props.location}>
                             <Route exact path='/' component={Auth} />
-                            <Route path='/home' component={Index} />
-                            <Route path='/reactgrid' component={ReactGridSample} />
+                            <Route path='/home' component={Home} />
+                            <Route path='/reactgrid' component={Sample} />
+                            <Route path='/report' component={Report} />
                             <Route path='/config' component={Config} />
+                            <Route component={NotFound} />
                         </Switch>
                     </PageFade>
                 </TransitionGroup>

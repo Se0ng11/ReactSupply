@@ -1,7 +1,11 @@
 ﻿import '../left/burger.css';
 import React from 'react';
 import axios from 'axios';
-import { slide as Menu } from 'react-burger-menu';
+import { push as Menu } from 'react-burger-menu';
+//import { LinkContainer } from 'react-router-bootstrap';
+//import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { Link } from "react-router-dom";
+
 //import {Collapse, Button, Well } from 'react-bootstrap';
 
 export default class Burger extends React.Component {
@@ -25,14 +29,16 @@ export default class Burger extends React.Component {
             });
     }
 
-    onClick = () => {
+    onClick = (value) => {
         console.log("click here");
     }
 
     generateSubContainer = () => {
         const obj = this.state.menu.map((value, index) => {
             if (localStorage.getItem("currentMenu") === value.MenuCode) {
-                <li>value</li>
+                return (
+                    <Link to={value.Url} key={value.SubCode}><i className={"fa " + value.SubClass} aria-hidden="true"></i> {value.SubName}</Link>
+                )
             }
         });
 
@@ -42,15 +48,12 @@ export default class Burger extends React.Component {
     render() {
         return (
             <Menu noOverlay pageWrapId={"page-wrap"}>
-                <ul>
-                    {this.generateSubContainer()}
-                </ul>
+                {this.generateSubContainer()}
             </Menu>
         )
     }
 
 }
-
 
 //<ul>
 //    <li>

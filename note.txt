@@ -8,3 +8,14 @@ Add-Migration InitialCreate
 
 #update the new change to database
 Update-Database
+
+
+
+#react boilerplate
+import React, { Component } from 'react';
+
+export class Config extends Component {
+
+
+
+}

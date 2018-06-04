@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
-import ReactGrids from '../dataTable/ReactGrids';
+import ReactGrids from '../../plugin/dataTable/ReactGrids';
 
-export class ReactGridSample extends Component {
+export class Sample extends Component {
 
     render() {
         return (

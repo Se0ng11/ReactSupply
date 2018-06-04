@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Grid, Row } from 'react-bootstrap';
-import { Top, Burger } from '../components/menu/MenuList';
+import { Top, Burger } from '../plugin/nav/NavList';
 export class Layout extends Component {
 
     render() {
@@ -9,8 +9,9 @@ export class Layout extends Component {
         if (isAuth) {
             return (
                 <div>
-                    <Top />
-                    <Burger />
+                    <Top>
+                        <Burger />
+                    </Top>
                     <Grid fluid id="page-wrap">
                         <Row>
                             <Col sm={12}>

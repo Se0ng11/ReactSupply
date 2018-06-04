@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react'; 
-import ReactGrids from '../dataTable/ReactGrids';
+import ReactGrids from '../../plugin/dataTable/ReactGrids';
 
 export class Config extends Component {
 
