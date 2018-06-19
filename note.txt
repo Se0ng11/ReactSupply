@@ -12,10 +12,16 @@ Update-Database
 
 
 #react boilerplate
-import React, { Component } from 'react';
+import React from 'react';
 
-export class Config extends Component {
+export class ClassName extends React.Component {
 
 
 
 }
+
+
+
+#npm boiler plate command
+cd c:\source\reactsupply\clientapp
+npm start

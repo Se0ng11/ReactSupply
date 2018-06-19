@@ -7,7 +7,7 @@ export class Csv extends Component {
 
     render() {
 
-        let fileName = moment().format("YYYYMMDD") + ".csv";
+        let fileName = window.location.pathname.substr(1) + moment().format("YYYYMMDD") + ".csv";
         return (
             <CSVLink data={this.props.body} filename={fileName} className="btn"><i className="fa fa-table" aria-hidden="true"></i> CSV</CSVLink>
         )

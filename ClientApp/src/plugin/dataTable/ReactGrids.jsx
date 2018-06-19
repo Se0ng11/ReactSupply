@@ -1,14 +1,13 @@
 ﻿import '../dataTable/ReactGrids.css';
 import React, { Component } from 'react';
-import ReactDataGrid from 'react-data-grid';
+import ReactDataGrid, { Row, Cell } from 'react-data-grid';
 import axios from 'axios';
 import update from 'immutability-helper';
-import ErrorBoundary from '../error/ErrorBoundary';
 import PropTypes from 'prop-types';
-//import { Row, Cell } from 'react-data-grid';
-import { DatePickerEditor } from './Editors/DatePickerEditor';
+import ErrorBoundary from '../error/ErrorBoundary';
+import { DatePickerEditor } from './Editors';
+import { BooleanFormatter, ModalFormatter, EmptyRowFormatter } from './Formatter';
 import { Csv } from './Exporter/Csv';
-
 
 const { Toolbar, Editors,  Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 //Formatters,
@@ -39,7 +38,13 @@ export default class ReactGrids extends Component {
             sortDirection: null,
             cellCss: "",
             cellRow: null,
-            cellCol: null
+            cellCol: null,
+            height: window.screen.availHeight - 250,
+            isModal: false,
+            modalData: {
+                header: [],
+                body:[]
+            }
         };
     }
 
@@ -59,9 +64,7 @@ export default class ReactGrids extends Component {
                     _rows[i].No = i + 1;
                 }
 
-                setTimeout(function () {
-                    self.setState({ header: _header, rows: _rows });
-                }, 500);
+                self.setState({ header: _header, rows: _rows });
              
             })
             .catch((error) => {
@@ -82,7 +85,11 @@ export default class ReactGrids extends Component {
     handleGridRowsUpdated = ({ cellKey, fromRow, toRow, updated, action, originRow }) => {
         let rows = Selectors.getRows(this.state);
         var self = this;
-        self.setState({ cellCss: "" });
+
+        if (self.state.cellCss === "border-success") {
+            self.setState({ cellCss: "" });
+        }
+       
         for (let i = fromRow; i <= toRow; i++) {
             let rowToUpdate = rows[i];
             let updatedRow = update(rowToUpdate, { $merge: updated });
@@ -191,13 +198,13 @@ export default class ReactGrids extends Component {
     };
 
     renderControlToEditor = (ary) => {
+
         if (ary.control === "date") {
             ary.editor = <DatePickerEditor />;
         }
         else if (ary.control.toLowerCase() === "boolean") {
             ary.editor = <DropDownEditor options={BoolItem} />
         }
-
         else if (ary.control === "DropDown") {
             ary.editor = <DropDownEditor options={ary.name === "ControlType"? ControlItem : ''} />;
         }
@@ -218,7 +225,6 @@ export default class ReactGrids extends Component {
     }
 
     renderStringToFormatter = (ary) => {
-
         if (ary.control.toLowerCase() === "boolean")
         {
             ary.formatter = <BooleanFormatter />;
@@ -227,8 +233,39 @@ export default class ReactGrids extends Component {
         return ary.formatter;
     }
 
+    onDoubleClick = (rowIdx, row, column) => {
+        if (column.control === "identity") {
+            const self = this;
+
+            axios.get("api/History/GetHistory", {
+                params: {
+                    identifier: row.AX6SO
+                },
+                cancelToken: new CancelToken(function executor(c) {
+                    cancel = c;
+                })
+            }).then((response) => {
+                let obj = JSON.parse(response.data);
+                let _header = JSON.parse(obj.Header);
+                let _rows = JSON.parse(obj.Body);
+
+                self.setState({
+                    isModal: true,
+                    modaldata: {
+                        header: _header,
+                        body: _rows
+                    }
+                });
+
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    }
+
     render() {
         let apiData = this.state.header;
+        let isClose = () => this.setState({ isModal: false });
 
         if (apiData !== undefined) {
             apiData = this.renderStringToObject(apiData);
@@ -245,24 +282,28 @@ export default class ReactGrids extends Component {
                                         rowGetter={this.rowGetter}
                                         rowsCount={this.getSize()}
                                         headerRowHeight={this.props.isDoubleHeader?100:0}
-                                        minHeight={650}
+                                        minHeight={this.state.height}
                                         cellNavigationMode="changeRow"
                                         onGridRowsUpdated={this.handleGridRowsUpdated}
+                                        onRowDoubleClick={this.onDoubleClick}
                                         toolbar={<Toolbar enableFilter={true} children={<Csv header={this.state.header} body={this.state.rows} />} />}
                                         onAddFilter={this.handleFilterChange}
                                         getValidFilterValues={this.getValidFilterValues}
                                         onClearFilters={this.onClearFilters}
-                                        emptyRowsView={EmptyRowsView}
+                                        emptyRowsView={EmptyRowFormatter}
+                                        rowRenderer={RowRenderer}
                                     />
                                 </ColorContext.Provider>
                             </ColContext.Provider>
                         </RowContext.Provider>
                     </ErrorBoundary>
+                    <ModalFormatter show={this.state.isModal} onHide={isClose} />
                 </div>
             )
         }
+
         return (<div>Loading....</div>);
-        //rowRenderer = { RowRenderer }
+
     }
 }
 
@@ -273,13 +314,8 @@ ReactGrids.propTypes = {
     isDoubleHeader: PropTypes.bool
 }
 
-class EmptyRowsView extends React.Component {
-    render() {
-        return (<div>Nothing to show</div>);
-    }
-}
 
-class HeaderGroup extends React.Component {
+class HeaderGroup extends Component {
     render() {
         if ((this.props.parent !== undefined) && this.props.isDoubleHeader) {
             return (
@@ -299,42 +335,39 @@ class HeaderGroup extends React.Component {
     }
 }
 
-//class CellRenderer extends Component {
+class CellRenderer extends Component {
+    setScrollLeft = (scrollBy) => {
+        // if you want freeze columns to work, you need to make sure you implement this as apass through
+        this.row.setScrollLeft(scrollBy);
+    };
 
-//    render() {
-//        return (
-//            <RowContext.Consumer>
-//                {row => (
-//                    <ColContext.Consumer>
-//                        {col => (
-//                            <ColorContext.Consumer>
-//                                {color => (
-//                                    <Cell {...this.props} className={(row === JSON.stringify(this.props.rowData) && col === this.props.column.key) ? color : ''} />
-//                                )}
-//                            </ColorContext.Consumer>
-//                        )}
-//                    </ColContext.Consumer>
-//                )}
-//            </RowContext.Consumer>
-//        );
-//    }
-//}
-
-
-//class RowRenderer extends Component {
-//    render() {
-//        return <Row cellRenderer={CellRenderer} ref="row" {...this.props} />;
-//    }
-//}
-
-
-class BooleanFormatter extends React.Component {
     render() {
-        var trueFalse = this.props.value.toString();
         return (
-            <div>
-                <span className={trueFalse}>{trueFalse}</span>
-            </div>
+            <RowContext.Consumer>
+                {row => (
+                    <ColContext.Consumer>
+                        {col => (
+                            <ColorContext.Consumer>
+                                {color => (
+                                    <Cell {...this.props} ref={node => this.row = node} className={(row === JSON.stringify(this.props.rowData) && col === this.props.column.key) ? color : ''} />
+                                )}
+                            </ColorContext.Consumer>
+                        )}
+                    </ColContext.Consumer>
+                )}
+            </RowContext.Consumer>
         );
+    }
+}
+
+
+class RowRenderer extends Component {
+
+    setScrollLeft = (scrollBy) => {
+        this.row.setScrollLeft(scrollBy);
+    };
+
+    render() {
+        return <Row cellRenderer={CellRenderer} ref={node => this.row = node} {...this.props} />;
     }
 }

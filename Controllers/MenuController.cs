@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
-using System.Threading.Tasks;
 
 namespace ReactSupply.Controllers
 {
@@ -9,7 +9,13 @@ namespace ReactSupply.Controllers
     [Route("api/Menu")]
     public class MenuController : BaseController
     {
-        public MenuController(SupplyChainContext configuration) => _context = configuration;
+        private readonly ILogger<MenuController> _logger;
+
+        public MenuController(SupplyChainContext configuration, ILogger<MenuController> logger)
+        {
+            _context = configuration;
+            _logger = logger;
+        }
 
         [HttpGet("[action]")]
         public string GetMenuDisplay()
@@ -28,5 +34,21 @@ namespace ReactSupply.Controllers
 
             return data;
         }
+
+
+        [HttpGet("[action]")]
+        public JsonResult GetMenu()
+        {
+            var obj = new MenuLogic(_context);
+            var obj1 = new SubMenuLogic(_context);
+
+            var data = obj.SelectVisibleData();
+            var data1 = obj1.SelectVisibleData();
+          
+            var format = new { top = data, left= data1 };
+
+            return FormatJSON(format);
+        }
+
     }
 }

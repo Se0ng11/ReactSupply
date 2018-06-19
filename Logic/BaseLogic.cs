@@ -23,6 +23,7 @@ namespace ReactSupply.Logic
                 locked = true,
                 editable = false,
                 control = "identity",
+                cellClass = "history",
                 width = 100,
                 filterable = true,
                 sortable = true,

@@ -10,6 +10,7 @@ namespace ReactSupply.Models.DB
         public virtual DbSet<SupplyRecord> SupplyRecord { get; set; }
         public virtual DbSet<Menu> Menu { get; set; }
         public virtual DbSet<SubMenu> SubMenu { get; set; }
+        public virtual DbSet<History> History { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -134,12 +135,16 @@ namespace ReactSupply.Models.DB
                 entity.Property(e => e.Position).HasColumnType("decimal(4, 2)");
             });
 
-
             modelBuilder.Entity<SubMenu>().HasOne(p => p.Menu)
                 .WithMany(b => b.SubMenus)
                 .HasForeignKey(p => p.MenuCode)
                 .HasConstraintName("ForeignKey_Menu_SubMenu");
-             
+
+            modelBuilder.Entity<History>(entity =>
+            {
+                entity.HasKey(e => new { e.Id, e.ModuleId, e.Identifier });
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
         }
     }
 }

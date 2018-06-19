@@ -10,6 +10,15 @@
 
 }
 
+.react-grid-HeaderCell, .react-grid-Cell--locked {
+    background: steelblue !important;
+    color: #fff !important;
+}
+
+.react-grid-HeaderCell-sortable{
+    min-height: 80px;
+}
+
 .drag-handle {
     display: none;
 }
@@ -46,23 +55,27 @@
     background: #bdc3c7 !important;
 }
 
-.cloud, .react-grid-Cell--locked, .react-grid-Row--odd .react-grid-Cell {
-    background: #ecf0f1 !important;
+.history {
+    cursor:pointer;
+}
+
+.cloud, .react-grid-Row--odd .react-grid-Cell {
+    background: #ecf0f1;
 }
 
 .border-success {
-    border: 1px solid green !important;
-    box-shadow: 0px 1px 20px -1px inset green;
+    border: 2px solid green !important;
+    /*box-shadow: 0px 1px 20px -1px inset green;*/
 }
 
 .border-failed {
-    border: 1px solid red !important;
-    box-shadow: 0px 1px 20px -1px inset red;
+    border: 2px solid red !important;
+    /*box-shadow: 0px 1px 20px -1px inset red;*/
 }
 
 .border-progress {
-    border: 1px solid yellow !important;
-    box-shadow: 0px 1px 20px -1px inset yellow;
+    border: 2px solid yellow !important;
+    /*box-shadow: 0px 1px 20px -1px inset yellow;*/
 }
 
 .true { 

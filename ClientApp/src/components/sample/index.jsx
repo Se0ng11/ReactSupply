@@ -6,11 +6,11 @@ export class Sample extends Component {
     render() {
         return (
             <div>
-                <ReactGrids
-                    getApi="api/Home/GetSupplyRecord"
-                    postApi="api/Home/PostSingleSupplyRecordField"
-                    isBasic={false}
-                    isDoubleHeader={true} />
+            <ReactGrids
+                getApi="api/Home/GetSupplyRecord"
+                postApi="api/Home/PostSingleSupplyRecordField"
+                isBasic={false}
+                isDoubleHeader={true} />
             </div>
         );
     }

@@ -1,33 +1,50 @@
 import React, { Component } from 'react';
-import { Col, Grid, Row } from 'react-bootstrap';
+import axios from 'axios';
 import { Top, Burger } from '../plugin/nav/NavList';
+import { Col, Grid, Row } from 'react-bootstrap';
+
 export class Layout extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            top: [],
+            left: []
+        }
+    }
+
+    componentDidMount() {
+        const self = this;
+        axios.get("api/Menu/GetMenu")
+            .then((response) => {
+                const data = JSON.parse(response.data);
+
+                self.setState({ top: JSON.parse(data.top), left: JSON.parse(data.left) });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }
 
     render() {
-        const isAuth = (this.props.location === undefined || this.props.location === "/" ? false : true);
+        let currentMenu = this.state.left.filter(menu => menu.MenuCode === localStorage.getItem("currentMenu"));
 
-        if (isAuth) {
-            return (
-                <div>
-                    <Top>
-                        <Burger />
-                    </Top>
-                    <Grid fluid id="page-wrap">
-                        <Row>
-                            <Col sm={12}>
-                                {this.props.children}
-                            </Col>
-                        </Row>
-                    </Grid>
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    {this.props.children}
-                </div>    
-            )
-        }
-       
+        return (
+            <div>
+                <Top menu={this.state.top} />
+                {
+                    currentMenu.length > 0 &&
+                    <Burger {...this.props} menu={this.state.left} />
+                }
+    
+                <Grid fluid id="page-wrap">
+                    <Row>
+                        <Col sm={12}>
+                            {React.cloneElement(this.props.children, { menu: currentMenu })}
+                        </Col>
+                    </Row>
+                </Grid>
+            </div>
+        );
     }
 }

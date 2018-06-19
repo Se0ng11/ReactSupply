@@ -56,6 +56,8 @@ namespace ReactSupply.Logic
                     _context.ConfigurationMain.Update(entity);
                     await _context.SaveChangesAsync().ConfigureAwait(false);
                     rm.Status = "Success";
+
+                    
                 }
                 else
                 {

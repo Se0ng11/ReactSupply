@@ -1,59 +1,46 @@
 ﻿import '../left/burger.css';
 import React from 'react';
-import axios from 'axios';
 import { push as Menu } from 'react-burger-menu';
 //import { LinkContainer } from 'react-router-bootstrap';
 //import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from "react-router-dom";
-
+import { withRouter } from 'react-router';
 //import {Collapse, Button, Well } from 'react-bootstrap';
 
-export default class Burger extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            menu: [],
-            open: false
-        }
-    }
-
-    componentDidMount() {
-        const self = this;
-        axios.get("api/Menu/GetSubMenuDisplay")
-            .then((response) => {
-                self.setState({ menu: JSON.parse(response.data) });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }
+class Burger extends React.Component {
 
     onClick = (value) => {
         console.log("click here");
     }
 
     generateSubContainer = () => {
-        const obj = this.state.menu.map((value, index) => {
+        const location = "/" + this.props.location.pathname.split('/')[1];
+        const obj = this.props.menu.map((value, index) => {
             if (localStorage.getItem("currentMenu") === value.MenuCode) {
                 return (
-                    <Link to={value.Url} key={value.SubCode}><i className={"fa " + value.SubClass} aria-hidden="true"></i> {value.SubName}</Link>
+                    <Link to={`${location}/` + value.SubCode } key={value.SubCode}><i className={"fa " + value.SubClass} aria-hidden="true"></i> {value.SubName}</Link>
                 )
             }
+            return "";
         });
 
         return obj;
     }
 
     render() {
+
         return (
-            <Menu noOverlay pageWrapId={"page-wrap"}>
-                {this.generateSubContainer()}
-            </Menu>
+            <div>
+                <Menu noOverlay pageWrapId={"page-wrap"}>
+                    {this.generateSubContainer()}
+                </Menu>
+                
+            </div>
         )
     }
-
 }
+
+export default withRouter(Burger);
 
 //<ul>
 //    <li>

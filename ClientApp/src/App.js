@@ -1,40 +1,64 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Switch } from 'react-router-dom';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Layout } from './components/Layout';
 import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuList';
+//import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-const PageFade = (props) => (
-    <CSSTransition
-        {...props}
-        classNames="fadeTranslate"
-        timeout={500}
-        mountOnEnter={true}
-        unmountOnExit={true}
-    />
+//const PageFade = (props) => (
+//    <CSSTransition
+//        {...props}
+//        classNames="fadeTranslate"
+//        timeout={500}
+//        mountOnEnter={true}
+//        unmountOnExit={true}
+//    />
+//)
+
+const MainRoute = ({ component: Component, ...rest }) => (
+    <Route {...rest} render={props => (
+        <Layout>
+            <Component {...props} />
+        </Layout>
+    )} />
 )
 
+MainRoute.displayName = "MainRoute";
+
 export default class App extends Component {    
+    displayName = "App";
 
     render() {
-        let locationKey = this.props.location.pathname;
-
         return (
-            <Layout location={locationKey}>
-                <TransitionGroup>
-                    <PageFade key={locationKey}>
-                        <Switch location={this.props.location}>
-                            <Route exact path='/' component={Auth} />
-                            <Route path='/home' component={Home} />
-                            <Route path='/reactgrid' component={Sample} />
-                            <Route path='/report' component={Report} />
-                            <Route path='/config' component={Config} />
-                            <Route component={NotFound} />
-                        </Switch>
-                    </PageFade>
-                </TransitionGroup>
-            </Layout>
+            <div>
+                <Switch location={this.props.location}>
+                    <Route exact path='/' component={Auth} />
+                    <MainRoute exact path='/home' component={Home} />
+                    <MainRoute exact path='/data' component={Sample} />
+                    <MainRoute exact path='/report' component={Report} />
+                    <MainRoute exact path='/report/:id' component={Report} />
+                    <MainRoute exact path='/config' component={Config} />
+                    <Route exact component={NotFound} />
+                </Switch>
+            </div>
         );
     }
 }
+
+//<div>
+//    <Layout location={locationKey}>
+//        <TransitionGroup>
+//            <PageFade key={locationKey}>
+//                <Switch location={this.props.location}>
+//                    <Route exact path='/' component={Auth} />
+//                    <Route exact path='/home' component={Home} />
+//                    <Route exact path='/data' component={Sample} />
+//                    <Route exact path='/report' component={Report} />
+//                    <Route exact path='/external' component={External} />
+//                    <Route exact path='/config' component={Config} />
+//                    <Route exact component={NotFound} />
+//                </Switch>
+//            </PageFade>
+//        </TransitionGroup>
+//    </Layout>
+//</div>

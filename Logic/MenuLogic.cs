@@ -30,7 +30,7 @@ namespace ReactSupply.Logic
             try
             {
                 lst = SelectAsList().Result
-                        .Where(x => x.IsEnabled = true);
+                        .Where(x => x.IsEnabled == true);
               
             }
             catch (Exception ex)

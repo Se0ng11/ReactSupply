@@ -11,14 +11,16 @@ export class Auth extends Component {
     render() {
         localStorage.clear();
         return (
-            <form className="form-signin">
-                <h2 className="form-signin-heading">Sample</h2>
-                <label className="sr-only">Email address</label>
-                <input type="email" id="inputEmail" className="form-control" placeholder="Sample ID" />
-                <label className="sr-only">Password</label>
-                <input type="password" id="inputPassword" className="form-control" placeholder="Password" />
-                <Link className="btn btn-lg btn-primary btn-block" to='/home' onClick={()=>this.onSignIn()}>Sign In <i className="fa fa-sign-in"></i></Link>
-            </form>
+            <div>
+                <form className="form-signin">
+                    <h2 className="form-signin-heading">Sample</h2>
+                    <label className="sr-only">Email address</label>
+                    <input type="email" id="inputEmail" className="form-control" placeholder="Sample ID" />
+                    <label className="sr-only">Password</label>
+                    <input type="password" id="inputPassword" className="form-control" placeholder="Password" />
+                    <Link className="btn btn-lg btn-primary btn-block" to='/home' onClick={()=>this.onSignIn()}>Sign In <i className="fa fa-sign-in"></i></Link>
+                </form>
+            </div>
         );
     }
 }
