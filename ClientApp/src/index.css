@@ -49,3 +49,9 @@ body {
 .fo-yellow {
     color: yellow;
 }
+
+.error {
+    color: red;
+    font-weight: bold;
+    font-size: 15px;
+}

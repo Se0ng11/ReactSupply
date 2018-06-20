@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+//using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NLog;
 using ReactSupply.Models.DB;
 
 namespace ReactSupply
@@ -20,6 +22,20 @@ namespace ReactSupply
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var connStr = Configuration.GetConnectionString("DefaultDatabase");
+
+            services.AddDbContext<SupplyChainContext>(options =>
+             options.UseSqlServer(connStr));
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connStr));
+
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+              .AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
+
+            LogManager.Configuration.Variables["DefaultConnection"] = connStr;
+
             services.AddMvc()
                  .AddJsonOptions(
                     options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -31,10 +47,7 @@ namespace ReactSupply
                 configuration.RootPath = "ClientApp/build";
             });
 
-            services.AddDbContext<SupplyChainContext>(options =>
-             options.UseSqlServer(Configuration.GetConnectionString("SupplyChainDatabase")));
-
-
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/Auth");
             //services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
         }
 

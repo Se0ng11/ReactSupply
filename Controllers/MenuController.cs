@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 
 namespace ReactSupply.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("api/Menu")]
     public class MenuController : BaseController

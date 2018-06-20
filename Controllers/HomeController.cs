@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReactSupply.Interface;
@@ -9,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace ReactSupply.Controllers
 {
+
+    [Authorize]
     [Produces("application/json")]
     [Route("api/Home")]
     public class HomeController : BaseController
