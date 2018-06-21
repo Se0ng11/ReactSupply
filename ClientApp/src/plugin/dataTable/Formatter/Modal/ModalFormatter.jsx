@@ -12,7 +12,6 @@ export class ModalFormatter extends React.Component {
             { key: 'count', name: 'Count' },
             { key: 'aaa', name: 'aaa' }
         ];
-
         this.state = null;
     }
 

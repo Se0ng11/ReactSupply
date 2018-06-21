@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
-import { Switch } from 'react-router-dom';
+import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuList';
 //import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -16,11 +16,14 @@ import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuL
 //)
 
 const MainRoute = ({ component: Component, ...rest }) => (
-    <Route {...rest} render={props => (
-        <Layout>
-            <Component {...props} />
-        </Layout>
-    )} />
+    localStorage.getItem("token") !== null ?
+        <Route {...rest} render={props => (
+            <Layout>
+                <Component {...props} />
+            </Layout>
+        )} />
+        :
+        <Redirect to="/" />
 )
 
 MainRoute.displayName = "MainRoute";
@@ -38,7 +41,8 @@ export default class App extends Component {
                     <MainRoute exact path='/report' component={Report} />
                     <MainRoute exact path='/report/:id' component={Report} />
                     <MainRoute exact path='/config' component={Config} />
-                    <Route exact component={NotFound} />
+                    <MainRoute exact path='/config/:id' component={Config} />
+                    <MainRoute exact component={NotFound} />
                 </Switch>
             </div>
         );

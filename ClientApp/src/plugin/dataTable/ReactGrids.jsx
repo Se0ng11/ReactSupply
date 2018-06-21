@@ -8,6 +8,7 @@ import ErrorBoundary from '../error/ErrorBoundary';
 import { DatePickerEditor } from './Editors';
 import { BooleanFormatter, ModalFormatter, EmptyRowFormatter } from './Formatter';
 import { Csv } from './Exporter/Csv';
+import { ToastContainer, toast } from 'react-toastify';
 
 const { Toolbar, Editors,  Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 //Formatters,
@@ -50,7 +51,13 @@ export default class ReactGrids extends Component {
 
     componentDidMount() {
         const self = this;    
-        axios.get(this.props.getApi, {
+        axios.get(this.props.getApi,
+        {
+            headers: {
+                "Authorization": "bearer " + localStorage.getItem("token")
+            }
+        },
+        {
             cancelToken: new CancelToken(function executor(c) {
                 cancel = c;
             })
@@ -68,7 +75,8 @@ export default class ReactGrids extends Component {
              
             })
             .catch((error) => {
-                console.log(error);
+                let msg = error.message + ": " + error.response.statusText; 
+                toast.error(msg);
             });
     }
 
@@ -120,15 +128,22 @@ export default class ReactGrids extends Component {
 
     postToServer = (aX, vC) => {
         const self = this;
-        axios.put(this.props.postApi, {
+        axios.put(this.props.postApi, 
+        {
             identifier: aX,
             updated: vC
-        })
+            },
+            {
+                headers: {
+                    "Authorization": "bearer " + localStorage.getItem("token")
+                }
+            }
+        )
         .then((response) => {
             self.setState({ cellCss: "border-success" });
         })
         .catch((error) => {
-            console.log(error);
+            toast.error(error.message);
             self.setState({ cellCss: "border-failed" });
         });
     }
@@ -237,14 +252,21 @@ export default class ReactGrids extends Component {
         if (column.control === "identity") {
             const self = this;
 
-            axios.get("api/History/GetHistory", {
-                params: {
-                    identifier: row.AX6SO
+            axios.get("api/History/GetHistory",
+                {
+                    headers: {
+                        "Authorization": "bearer " + localStorage.getItem("token")
+                    }
                 },
-                cancelToken: new CancelToken(function executor(c) {
-                    cancel = c;
-                })
-            }).then((response) => {
+                {
+                    params: {
+                        identifier: row.AX6SO
+                    },
+                    cancelToken: new CancelToken(function executor(c) {
+                        cancel = c;
+                    }),
+                }
+            ).then((response) => {
                 let obj = JSON.parse(response.data);
                 let _header = JSON.parse(obj.Header);
                 let _rows = JSON.parse(obj.Body);
@@ -258,7 +280,7 @@ export default class ReactGrids extends Component {
                 });
 
             }).catch((error) => {
-                console.log(error);
+                toast.error(error.message);
             });
         }
     }
@@ -298,6 +320,17 @@ export default class ReactGrids extends Component {
                         </RowContext.Provider>
                     </ErrorBoundary>
                     <ModalFormatter show={this.state.isModal} onHide={isClose} />
+                    <ToastContainer
+                        position="top-left"
+                        autoClose={10000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}
+                        pauseOnVisibilityChange
+                        draggable
+                        pauseOnHover
+                    />
                 </div>
             )
         }

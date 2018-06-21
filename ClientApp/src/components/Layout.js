@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Top, Burger } from '../plugin/nav/NavList';
 import { Col, Grid, Row } from 'react-bootstrap';
+import { ToastContainer, toast } from 'react-toastify';
 
 export class Layout extends Component {
     constructor(props) {
@@ -15,15 +16,19 @@ export class Layout extends Component {
 
     componentDidMount() {
         const self = this;
-        axios.get("api/Menu/GetMenu")
-            .then((response) => {
+        axios.get("api/Menu/GetMenu",
+            {
+                headers: {
+                    "Authorization": "bearer " + localStorage.getItem("token")
+                }
+            }
+        ).then((response) => {
                 const data = JSON.parse(response.data);
-
                 self.setState({ top: JSON.parse(data.top), left: JSON.parse(data.left) });
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        })
+        .catch((error) => {
+            toast.error(error.message);
+        });
     }
 
     render() {
@@ -44,6 +49,17 @@ export class Layout extends Component {
                         </Col>
                     </Row>
                 </Grid>
+                <ToastContainer
+                    position="top-left"
+                    autoClose={10000}
+                    hideProgressBar={false}
+                    newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnVisibilityChange
+                    draggable
+                    pauseOnHover
+                />
             </div>
         );
     }

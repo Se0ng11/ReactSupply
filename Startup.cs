@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 //using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -5,8 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using NLog;
 using ReactSupply.Models.DB;
+using System.Text;
 
 namespace ReactSupply
 {
@@ -31,8 +34,28 @@ namespace ReactSupply
                 options.UseSqlServer(connStr));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-              .AddEntityFrameworkStores<ApplicationDbContext>()
-              .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;   
+                options.RequireHttpsMetadata = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidAudience = Static.Const.COMPANY_WEBADDRESS,
+                    ValidIssuer = Static.Const.COMPANY_WEBADDRESS,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Static.Const.ACCESS_KEY))
+                };
+            });
 
             LogManager.Configuration.Variables["DefaultConnection"] = connStr;
 
@@ -65,6 +88,7 @@ namespace ReactSupply
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            AuthAppBuilderExtensions.UseAuthentication(app);
 
             app.UseMvc(routes =>
             {
@@ -83,6 +107,8 @@ namespace ReactSupply
                     spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
                 }
             });
+
+            
         }
     }
 }

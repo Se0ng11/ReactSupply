@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ReactSupply.Models.Entity
+namespace ReactSupply.Models.ViewModel.User
 {
-    public class LoginViewModel
+    public class LoginViewModel:UserViewModel
     {
-        public string Id { get; set; }
-        public string Password { get; set; }
+        public LoginViewModel():base()
+        {
+
+        }
+
         public string LoginUrl { get; set; }
     }
 }

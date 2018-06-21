@@ -2,30 +2,37 @@
 import React from 'react';
 import axios from 'axios';
 //import { Link } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
 
 export class Auth extends React.Component {
-
     constructor() {
         super();
 
         this.state = {
-            id: "",
+            userName: "",
             password: "",
             message: ""
         }
         this.onChange = this.onChange.bind(this);
+        //if (localStorage.getItem("token") !== null) {
+        //    window.location.href = "/home";
+            
+        //}
     }
 
     onSubmit= (e) => {
         e.preventDefault();
         axios.post('api/Auth', {
-            Id: this.state.id,
+            UserName: this.state.userName,
             Password: this.state.password
         }).then((response) => {
             var data = JSON.parse(response.data);
 
             if (data.Status === "SUCCESS") {
+                var result = JSON.parse(data.Result);
                 localStorage.setItem("currentMenu", 0);
+                localStorage.setItem("token", result.Token);
+                localStorage.setItem("refresh", result.Refresh);
                 window.location.href = "/home";
 
             } else {
@@ -36,7 +43,7 @@ export class Auth extends React.Component {
 
             }
         }).catch((error) => {
-            console.log(error);
+            toast.error(error.message);
         });
     }
 
@@ -49,18 +56,28 @@ export class Auth extends React.Component {
     }
 
     render() {
-        localStorage.clear();
         return (
             <div>
                 <form className="form-signin" onSubmit={this.onSubmit}>
                     <h2 className="form-signin-heading">Sample</h2>
                     <label className="sr-only">Email address</label>
-                    <input type="input" name="id" className="form-control" placeholder="Sample ID" onChange={this.onChange} />
+                    <input type="input" name="userName" className="form-control" placeholder="Sample ID" onChange={this.onChange} />
                     <label className="sr-only">Password</label>
                     <input type="password" name="password" className="form-control" placeholder="Password" onChange={this.onChange} />
                     <button type="submit" className="btn btn-lg btn-primary btn-block">Sign In <i className="fa fa-sign-in"></i></button>
                     <span className="error">{this.state.message}</span>
                 </form>
+                <ToastContainer
+                    position="top-left"
+                    autoClose={10000}
+                    hideProgressBar={false}
+                    newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnVisibilityChange
+                    draggable
+                    pauseOnHover
+                />
             </div>
         );
     }
