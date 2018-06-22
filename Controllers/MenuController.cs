@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ReactSupply.Logic;
@@ -11,11 +12,15 @@ namespace ReactSupply.Controllers
     [Route("api/Menu")]
     public class MenuController : BaseController
     {
-        private readonly ILogger<MenuController> _logger;
+        private readonly SupplyChainContext _context;
+        private readonly ILogger<HistoryController> _logger;
 
-        public MenuController(SupplyChainContext configuration, ILogger<MenuController> logger)
+        public MenuController(SupplyChainContext context,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<HistoryController> logger) :base(context, userManager, signInManager,logger)
         {
-            _context = configuration;
+            _context = context;
             _logger = logger;
         }
 

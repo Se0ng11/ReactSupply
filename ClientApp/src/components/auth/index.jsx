@@ -33,6 +33,7 @@ export class Auth extends React.Component {
                 localStorage.setItem("currentMenu", 0);
                 localStorage.setItem("token", result.Token);
                 localStorage.setItem("refresh", result.Refresh);
+                localStorage.setItem("user", result.UserId);
                 window.location.href = "/home";
 
             } else {

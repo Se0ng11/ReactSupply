@@ -30,7 +30,8 @@ namespace ReactSupply.Logic
             try
             {
                 lst = SelectAsList().Result
-                        .Where(x => x.IsEnabled == true);
+                        .Where(x => x.IsEnabled == true)
+                        .OrderBy(x=> x.Position);
               
             }
             catch (Exception ex)
@@ -53,6 +54,7 @@ namespace ReactSupply.Logic
             try
             {
                 lst = await _context.Menu
+                        .OrderBy(x=> x.Position)
                         .AsNoTracking()
                         .ToListAsync()
                         .ConfigureAwait(false);

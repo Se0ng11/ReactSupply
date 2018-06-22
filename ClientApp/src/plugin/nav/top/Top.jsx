@@ -27,6 +27,7 @@ export default class Top extends React.Component {
     }
 
     render() {
+        let user = localStorage.getItem('user');
         return (
             <div>
                 <Navbar fluid collapseOnSelect fixedTop className="shadow">
@@ -49,7 +50,7 @@ export default class Top extends React.Component {
                             <Link className="btn btn-danger btn-block" to='/' onClick={()=> this.onSignOut()}>Sign Out <i className="fa fa-sign-out"></i></Link>
                         </Navbar.Form>
                         <div className="navbar-form navbar-right">
-                            <h5><i className="fa fa-user" aria-hidden="true"></i> Welcome, User</h5>
+                            <h5><i className="fa fa-user" aria-hidden="true"></i> { user }</h5>
                         </div>
                     </Navbar.Collapse>
                 </Navbar>

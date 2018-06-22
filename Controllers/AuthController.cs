@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
@@ -19,7 +20,11 @@ namespace ReactSupply.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ResponseMessage _responseMessage = new ResponseMessage();
 
-        public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AuthController(SupplyChainContext context,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<HistoryController> logger)
+            : base(context, userManager, signInManager, logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -39,8 +44,8 @@ namespace ReactSupply.Controllers
                     var token = new JwtTokenLogic().GenerateJwtToken(model.UserName, "", out string outRefreshToken);
                  
                     await _userManager.SetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN, outRefreshToken);
-                    await _signInManager.SignInAsync(user, true);
-                    var s = await _signInManager.CreateUserPrincipalAsync(user);
+                    //await _signInManager.SignInAsync(user, true);
+                    //var s = await _signInManager.CreateUserPrincipalAsync(user);
 
                     _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
                     _responseMessage.Result = token;
@@ -58,30 +63,6 @@ namespace ReactSupply.Controllers
             }
           
             return FormatJSON(_responseMessage);
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> RefreshToken(JwtTokenResponse token)
-        {
-            ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);  
-            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN);
-
-            if (token.Refresh == currentRefresh)
-            {
-                var newToken = new JwtTokenLogic().GenerateJwtToken(user.UserName, currentRefresh, out string outRefreshToken);
-
-                _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
-                _responseMessage.Result = newToken;
-            }
-            else
-            {
-
-                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                _responseMessage.Result = Static.Const.UNAUTHORIZED;
-            }
-   
-            return FormatJSON(_responseMessage);
-            
         }
 
         [HttpGet]

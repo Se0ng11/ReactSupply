@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using ReactSupply.Models.DB;
+using System;
 using System.Text;
 
 namespace ReactSupply
@@ -42,20 +43,36 @@ namespace ReactSupply
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+              
             })
             .AddJwtBearer(options =>
             {
                 options.SaveToken = true;   
                 options.RequireHttpsMetadata = true;
+              
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
                     ValidAudience = Static.Const.COMPANY_WEBADDRESS,
                     ValidIssuer = Static.Const.COMPANY_WEBADDRESS,
+                    ClockSkew = TimeSpan.FromMinutes(0),
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Static.Const.ACCESS_KEY))
                 };
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.WithOrigins()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader()
+                      .AllowCredentials()
+                .Build());
+            });
+
 
             LogManager.Configuration.Variables["DefaultConnection"] = connStr;
 
@@ -88,6 +105,7 @@ namespace ReactSupply
 
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+            app.UseCors("CorsPolicy");
             AuthAppBuilderExtensions.UseAuthentication(app);
 
             app.UseMvc(routes =>

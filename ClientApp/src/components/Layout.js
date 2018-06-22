@@ -17,17 +17,13 @@ export class Layout extends Component {
     componentDidMount() {
         const self = this;
         axios.get("api/Menu/GetMenu",
-            {
-                headers: {
-                    "Authorization": "bearer " + localStorage.getItem("token")
-                }
-            }
         ).then((response) => {
                 const data = JSON.parse(response.data);
                 self.setState({ top: JSON.parse(data.top), left: JSON.parse(data.left) });
         })
         .catch((error) => {
-            toast.error(error.message);
+            let msg = "Layout() " + error.message + ": " + error.response.statusText;
+            toast.error(msg);
         });
     }
 

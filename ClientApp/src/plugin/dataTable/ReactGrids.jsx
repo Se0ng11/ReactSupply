@@ -53,11 +53,6 @@ export default class ReactGrids extends Component {
         const self = this;    
         axios.get(this.props.getApi,
         {
-            headers: {
-                "Authorization": "bearer " + localStorage.getItem("token")
-            }
-        },
-        {
             cancelToken: new CancelToken(function executor(c) {
                 cancel = c;
             })
@@ -75,7 +70,7 @@ export default class ReactGrids extends Component {
              
             })
             .catch((error) => {
-                let msg = error.message + ": " + error.response.statusText; 
+                let msg = "ReactGrids() " + error.message + ": " + error.response.statusText; 
                 toast.error(msg);
             });
     }
@@ -132,18 +127,13 @@ export default class ReactGrids extends Component {
         {
             identifier: aX,
             updated: vC
-            },
-            {
-                headers: {
-                    "Authorization": "bearer " + localStorage.getItem("token")
-                }
-            }
-        )
+        })
         .then((response) => {
             self.setState({ cellCss: "border-success" });
         })
         .catch((error) => {
-            toast.error(error.message);
+            let msg = "postToServer() " + error.message + ": " + error.response.statusText; 
+            toast.error(msg);
             self.setState({ cellCss: "border-failed" });
         });
     }
@@ -254,11 +244,6 @@ export default class ReactGrids extends Component {
 
             axios.get("api/History/GetHistory",
                 {
-                    headers: {
-                        "Authorization": "bearer " + localStorage.getItem("token")
-                    }
-                },
-                {
                     params: {
                         identifier: row.AX6SO
                     },
@@ -280,7 +265,9 @@ export default class ReactGrids extends Component {
                 });
 
             }).catch((error) => {
-                toast.error(error.message);
+                let msg = "postToServer() " + error.message + ": " + error.response.statusText; 
+
+                toast.error(msg);
             });
         }
     }

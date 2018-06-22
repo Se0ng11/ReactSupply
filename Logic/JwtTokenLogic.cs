@@ -30,6 +30,7 @@ namespace ReactSupply.Logic
                     obj.Refresh = originalRefreshToken;
                 }
 
+                obj.UserId = userName;
 
             }
             catch(Exception ex)
@@ -57,7 +58,8 @@ namespace ReactSupply.Logic
                    {
                         new Claim(JwtRegisteredClaimNames.Sub, userName),
                         new Claim(JwtRegisteredClaimNames.UniqueName, userName),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(JwtRegisteredClaimNames.Exp, expires.ToString())
                     };
 
 

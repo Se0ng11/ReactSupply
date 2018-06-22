@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReactSupply.Interface;
@@ -16,7 +18,16 @@ namespace ReactSupply.Controllers
     [Route("api/Home")]
     public class HomeController : BaseController
     {
-        public HomeController(SupplyChainContext context) => _context = context;
+        private SupplyChainContext _context;
+
+        public HomeController(SupplyChainContext context,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<HistoryController> logger)
+            : base(context, userManager, signInManager, logger)
+        {
+            _context = context;
+        }
 
         [HttpGet("[action]")]
         public JsonResult GetSupplyRecord()

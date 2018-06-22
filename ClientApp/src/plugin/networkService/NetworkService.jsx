@@ -1,30 +1,35 @@
 ﻿import axios from 'axios';
 
 export default {
-    setupInterceptors: () => {
+    setupRequestInterceptors: () => {
         axios.interceptors.request.use(function (config) {
+            config.headers.authorization = "bearer " + localStorage.getItem("token");
+            return config;
+        }, function (error) {
+            return Promise.reject(error);
+        });
+    },
+    setupResponseInterceptors: () => {
+        axios.interceptors.response.use(function (config) {
             return config;
         }, function (error) {
             let erroResponse = error.response;
 
             if (erroResponse.status === 401) {
-                window.axios.interceptors.response.eject(this.setupInterceptors);
-                return window.axios.post('/api/Auth/RefreshToken', {
+                return axios.post('/api/Token/RefreshToken', {
+                    UserId: localStorage.getItem("user"),
                     Refresh: localStorage.getItem("refresh")
                 }).then(response => {
-                    let data = JSON.parse(response);
+                    let data = JSON.parse(response.data);
 
                     if (data.Status === "SUCCESS") {
-                        localStorage.setItem("token", response.Token);
+                        var result = JSON.parse(data.Result);
+                        localStorage.setItem("token", result.Token);
+                        localStorage.setItem("refresh", result.Refresh);
+                        localStorage.setItem("user", result.UserId);
                     }
-
-                    erroResponse.config.headers['Authorization'] = 'Bearer ' + response.data.access_token;
-                    this.createAxiosResponseInterceptor();
-                    return window.axios(erroResponse.config);
+                    return axios(erroResponse.config);
                 }).catch(error => {
-                    //this.destroyToken();
-                    //this.createAxiosResponseInterceptor();
-                    //this.router.push('/login');
                     return Promise.reject(error);
                 });
             }

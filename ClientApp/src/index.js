@@ -13,7 +13,8 @@ import NetworkService  from './plugin/networkService/NetworkService';
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 const rootElement = document.getElementById('root');
 
-NetworkService.setupInterceptors();
+NetworkService.setupRequestInterceptors();
+NetworkService.setupResponseInterceptors();
 
 ReactDOM.render(
   <BrowserRouter basename={baseUrl}>
