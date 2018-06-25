@@ -43,7 +43,7 @@ namespace ReactSupply.Controllers
                     //var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN);
                     var token = new JwtTokenLogic().GenerateJwtToken(model.UserName, "", out string outRefreshToken);
                  
-                    await _userManager.SetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN, outRefreshToken);
+                    await _userManager.SetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN, outRefreshToken);
                     //await _signInManager.SignInAsync(user, true);
                     //var s = await _signInManager.CreateUserPrincipalAsync(user);
 
@@ -53,7 +53,7 @@ namespace ReactSupply.Controllers
                 else
                 {
                     _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                    _responseMessage.Result = Static.Const.LOGININFO;
+                    _responseMessage.Result = Static.Messages.LOGININFO;
                 }
             }
             catch(Exception ex)
@@ -65,7 +65,7 @@ namespace ReactSupply.Controllers
             return FormatJSON(_responseMessage);
         }
 
-        [HttpGet]
+        [HttpPost("[action]")]
         public async Task<JsonResult> RegisterAsync([FromBody]RegisterViewModel model)
         {
             try
@@ -105,11 +105,27 @@ namespace ReactSupply.Controllers
             return FormatJSON(_responseMessage);
         }
 
-        [HttpGet]
-        public IActionResult Logout()
+        [HttpPost("[action]")]
+        public async Task<JsonResult> Logout([FromBody] JwtTokenResponse token)
         {
-            _signInManager.SignOutAsync();
-            return View();
+            ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
+            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
+
+            if (token.Refresh == currentRefresh)
+            {
+                var deletedToken = await _userManager.RemoveAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
+
+                if (deletedToken.Succeeded)
+                {
+                    _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
+                }
+            }
+            else
+            {
+                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
+                _responseMessage.Result = Static.Messages.UNAUTHORIZED;
+            }
+            return FormatJSON(_responseMessage);
         }
     }
 }

@@ -28,9 +28,11 @@ const MainRoute = ({ component: Component, ...rest }) => (
 
 MainRoute.displayName = "MainRoute";
 
+
+
+
 export default class App extends Component {    
     displayName = "App";
-
     render() {
         return (
             <div>
@@ -44,6 +46,7 @@ export default class App extends Component {
                     <MainRoute exact path='/config/:id' component={Config} />
                     <MainRoute exact component={NotFound} />
                 </Switch>
+              
             </div>
         );
     }

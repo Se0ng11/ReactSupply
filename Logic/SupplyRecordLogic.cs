@@ -13,7 +13,7 @@ namespace ReactSupply.Logic
 
         public async Task<string> SelectAllDataAsync()
         {
-            JSONResult lst = new JSONResult();
+            ResultJson lst = new ResultJson();
 
             try
             {

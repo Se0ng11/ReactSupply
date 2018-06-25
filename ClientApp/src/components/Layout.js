@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Top, Burger } from '../plugin/nav/NavList';
 import { Col, Grid, Row } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
+import { Redirect } from 'react-router-dom';
+import IdleTimer from 'react-idle-timer';
 
 export class Layout extends Component {
     constructor(props) {
@@ -10,7 +12,9 @@ export class Layout extends Component {
 
         this.state = {
             top: [],
-            left: []
+            left: [],
+            redirect: false,
+            timeOut: 900000
         }
     }
 
@@ -27,35 +31,56 @@ export class Layout extends Component {
         });
     }
 
+    _onIdle = () => {
+        localStorage.clear();
+        this.setState({ redirect: true });
+    }
+
+    _onActive = () => {
+     
+    }
+
     render() {
         let currentMenu = this.state.left.filter(menu => menu.MenuCode === localStorage.getItem("currentMenu"));
+        let isRedirect = this.state.redirect;
+
+        if (isRedirect) {
+            return <Redirect to="/" />
+        }
 
         return (
             <div>
-                <Top menu={this.state.top} />
-                {
-                    currentMenu.length > 0 &&
-                    <Burger {...this.props} menu={this.state.left} />
-                }
+                <IdleTimer
+                    ref="idleTimer"
+                    element={document}
+                    activeAction={this._onActive}
+                    idleAction={this._onIdle}
+                    timeout={this.state.timeOut}>
+                        <Top menu={this.state.top} />
+                        {
+                            currentMenu.length > 0 &&
+                            <Burger {...this.props} menu={this.state.left} />
+                        }
     
-                <Grid fluid id="page-wrap">
-                    <Row>
-                        <Col sm={12}>
-                            {React.cloneElement(this.props.children, { menu: currentMenu })}
-                        </Col>
-                    </Row>
-                </Grid>
-                <ToastContainer
-                    position="top-left"
-                    autoClose={10000}
-                    hideProgressBar={false}
-                    newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnVisibilityChange
-                    draggable
-                    pauseOnHover
-                />
+                        <Grid fluid id="page-wrap">
+                            <Row>
+                                <Col sm={12}>
+                                    {React.cloneElement(this.props.children, { menu: currentMenu })}
+                                </Col>
+                            </Row>
+                        </Grid>
+                        <ToastContainer
+                            position="top-left"
+                            autoClose={10000}
+                            hideProgressBar={false}
+                            newestOnTop
+                            closeOnClick
+                            rtl={false}
+                            pauseOnVisibilityChange
+                            draggable
+                            pauseOnHover
+                        />
+                </IdleTimer>
             </div>
         );
     }

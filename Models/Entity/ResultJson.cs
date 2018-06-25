@@ -2,7 +2,7 @@
 
 namespace ReactSupply.Models.Entity
 {
-    public class JSONResult
+    public class ResultJson
     {
         [Key]
         public string JsonResult { get; set; }

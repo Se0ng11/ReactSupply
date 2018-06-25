@@ -1,7 +1,7 @@
 ﻿import '../auth/auth.css';
 import React from 'react';
 import axios from 'axios';
-//import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 
 export class Auth extends React.Component {
@@ -11,13 +11,16 @@ export class Auth extends React.Component {
         this.state = {
             userName: "",
             password: "",
-            message: ""
+            message: "",
+            redirect: false
         }
         this.onChange = this.onChange.bind(this);
-        //if (localStorage.getItem("token") !== null) {
-        //    window.location.href = "/home";
-            
-        //}
+    }
+
+    componentDidMount() {
+        if (localStorage.getItem("token") !== null) {
+            this.setState({ redirect: true });
+        }
     }
 
     onSubmit= (e) => {
@@ -34,7 +37,7 @@ export class Auth extends React.Component {
                 localStorage.setItem("token", result.Token);
                 localStorage.setItem("refresh", result.Refresh);
                 localStorage.setItem("user", result.UserId);
-                window.location.href = "/home";
+                this.setState({redirect: true});
 
             } else {
                 this.setState({
@@ -57,6 +60,12 @@ export class Auth extends React.Component {
     }
 
     render() {
+       
+        let redirect = this.state.redirect;
+       
+        if (redirect) {
+            return <Redirect to="/home" />
+        }
         return (
             <div>
                 <form className="form-signin" onSubmit={this.onSubmit}>

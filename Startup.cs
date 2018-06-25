@@ -56,10 +56,10 @@ namespace ReactSupply
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidAudience = Static.Const.COMPANY_WEBADDRESS,
-                    ValidIssuer = Static.Const.COMPANY_WEBADDRESS,
+                    ValidAudience = Static.Messages.COMPANY_WEBADDRESS,
+                    ValidIssuer = Static.Messages.COMPANY_WEBADDRESS,
                     ClockSkew = TimeSpan.FromMinutes(0),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Static.Const.ACCESS_KEY))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Static.Messages.ACCESS_KEY))
                 };
             });
 

@@ -30,7 +30,7 @@ namespace ReactSupply.Controllers
         public async Task<JsonResult> RefreshToken([FromBody]JwtTokenResponse token)
         {
             ApplicationUser user = await _userManager.FindByNameAsync(token.UserId);
-            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN);
+            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
 
             if (token.Refresh == currentRefresh)
             {
@@ -43,11 +43,40 @@ namespace ReactSupply.Controllers
             {
 
                 _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                _responseMessage.Result = Static.Const.UNAUTHORIZED;
+                _responseMessage.Result = Static.Messages.INVALIDTOKEN;
             }
 
             return FormatJSON(_responseMessage);
 
+        }
+
+        [Authorize]
+        [HttpPost("[action]")]
+        public async Task<JsonResult> RemoveToken([FromBody] JwtTokenResponse token)
+        {
+
+            ApplicationUser user = await _userManager.FindByNameAsync(token.UserId);
+            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
+
+            if (token.Refresh == currentRefresh)
+            {
+                var deletedToken = await _userManager.RemoveAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
+
+                if (deletedToken.Succeeded) { 
+                    _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
+                }
+                else
+                {
+                    _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
+                    _responseMessage.Result = Static.Messages.INVALIDTOKEN;
+                }
+            }
+            else
+            {
+                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
+                _responseMessage.Result = Static.Messages.INVALIDTOKEN;
+            }
+            return FormatJSON(_responseMessage);
         }
     }
 }

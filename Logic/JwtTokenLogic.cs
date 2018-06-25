@@ -16,13 +16,13 @@ namespace ReactSupply.Logic
 
             try
             {
-                var accessToken = GenerateJwtToken(userName, DateTime.UtcNow.AddMinutes(15), Static.Const.ACCESS_KEY);
+                var accessToken = GenerateJwtToken(userName, DateTime.UtcNow.AddMinutes(15), Static.Messages.ACCESS_KEY);
                 JwtSecurityToken refreshToken = null;
                 obj.Token = new JwtSecurityTokenHandler().WriteToken(accessToken);
 
                 if (string.IsNullOrEmpty(originalRefreshToken))
                 {
-                    refreshToken = GenerateJwtToken(userName, DateTime.UtcNow.AddDays(14), Static.Const.REFRESH_KEY);
+                    refreshToken = GenerateJwtToken(userName, DateTime.UtcNow.AddDays(14), Static.Messages.REFRESH_KEY);
                     obj.Refresh = new JwtSecurityTokenHandler().WriteToken(refreshToken);
                 }
                 else
@@ -42,6 +42,7 @@ namespace ReactSupply.Logic
             return ConvertToJSON(obj);
         }
 
+      
         //public string GenerateRefreshToken(string userName)
         //{
         //    var refreshToken = GenerateJwtToken(userName, DateTime.UtcNow.AddDays(14), Static.Const.REFRESH_KEY);
@@ -65,8 +66,8 @@ namespace ReactSupply.Logic
 
                 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
                 token = new JwtSecurityToken(
-                        issuer: Static.Const.COMPANY_WEBADDRESS,
-                        audience: Static.Const.COMPANY_WEBADDRESS,
+                        issuer: Static.Messages.COMPANY_WEBADDRESS,
+                        audience: Static.Messages.COMPANY_WEBADDRESS,
                         expires: expires,
                         claims: claims,
                         signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
