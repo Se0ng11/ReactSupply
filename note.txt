@@ -5,10 +5,13 @@ Scaffold-DbContext "Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=
 
 #add a new migration
 Add-Migration InitialCreate
+Remove-Migration
 
 #update the new change to database
 Update-Database
 
+update-database -context SupplyChainContext
+update-database -context ApplicationDbContext
 
 
 #react boilerplate
@@ -19,7 +22,6 @@ export class ClassName extends React.Component {
 
 
 }
-
 
 
 #npm boiler plate command

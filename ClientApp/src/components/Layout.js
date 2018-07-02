@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Top, Burger } from '../plugin/nav/NavList';
 import { Col, Grid, Row } from 'react-bootstrap';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Redirect } from 'react-router-dom';
 import IdleTimer from 'react-idle-timer';
 
@@ -69,17 +69,6 @@ export class Layout extends Component {
                                 </Col>
                             </Row>
                         </Grid>
-                        <ToastContainer
-                            position="top-left"
-                            autoClose={10000}
-                            hideProgressBar={false}
-                            newestOnTop
-                            closeOnClick
-                            rtl={false}
-                            pauseOnVisibilityChange
-                            draggable
-                            pauseOnHover
-                        />
                 </IdleTimer>
             </div>
         );

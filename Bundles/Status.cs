@@ -1,6 +1,6 @@
-﻿namespace ReactSupply.Static
+﻿namespace ReactSupply.Bundles
 {
-    public static class Response
+    public static class Status
     {
         public enum MessageType
         {

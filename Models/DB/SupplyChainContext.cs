@@ -11,6 +11,7 @@ namespace ReactSupply.Models.DB
         public virtual DbSet<Menu> Menu { get; set; }
         public virtual DbSet<SubMenu> SubMenu { get; set; }
         public virtual DbSet<History> History { get; set; }
+        public virtual DbSet<Setting> Setting { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -144,6 +145,12 @@ namespace ReactSupply.Models.DB
             {
                 entity.HasKey(e => new { e.Id, e.ModuleId, e.Identifier });
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            });
+
+            modelBuilder.Entity<Setting>(entity =>
+            {
+                entity.HasKey(e => new { e.Code });
+                entity.Property(e => e.Code).HasMaxLength(20);
             });
         }
     }

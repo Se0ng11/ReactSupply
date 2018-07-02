@@ -2,17 +2,18 @@
 import React from 'react';
 import axios from 'axios';
 import { Redirect } from "react-router-dom";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 export class Auth extends React.Component {
     constructor() {
         super();
 
         this.state = {
-            userName: "",
+            userId: "",
             password: "",
             message: "",
-            redirect: false
+            redirect: false,
+            disabled: false
         }
         this.onChange = this.onChange.bind(this);
     }
@@ -25,26 +26,50 @@ export class Auth extends React.Component {
 
     onSubmit= (e) => {
         e.preventDefault();
-        axios.post('api/Auth', {
-            UserName: this.state.userName,
-            Password: this.state.password
+        let self = this;
+        this.setState({ disabled: true });
+
+        axios.post('http://ngc-devvm1:8086/api/login/login', {
+            AppId: "Rr0eExUJ0zlvXr02",
+            UserId: self.state.userId,
+            Password: self.state.password
+        }).then((response) => {
+            var data = response.data.Data;
+            if (data !== null) {
+                self.onADLogin(self, self.state.userId, data.Token);
+            } else {
+                self.setState({
+                    message: response.data.ResponseMessage,
+                    disabled: false
+                });
+            }
+
+        }).catch((error) => {
+            toast.error(error.message);
+        });
+    }
+
+    onADLogin=(self, userId, adToken) => {
+         axios.post('api/Auth', {
+             UserId: userId
         }).then((response) => {
             var data = JSON.parse(response.data);
 
             if (data.Status === "SUCCESS") {
+
                 var result = JSON.parse(data.Result);
                 localStorage.setItem("currentMenu", 0);
                 localStorage.setItem("token", result.Token);
                 localStorage.setItem("refresh", result.Refresh);
                 localStorage.setItem("user", result.UserId);
-                this.setState({redirect: true});
-
+                localStorage.setItem("role", result.Role);
+                localStorage.setItem("adToken", adToken);
+                self.setState({redirect: true, disabled: false});
             } else {
-                this.setState({
-                    message: data.Result
+                self.setState({
+                    message: data.Result,
+                    disabled: false
                 });
-
-
             }
         }).catch((error) => {
             toast.error(error.message);
@@ -56,7 +81,6 @@ export class Auth extends React.Component {
             [e.target.name]: e.target.value,
             message: ""
         });
-      
     }
 
     render() {
@@ -71,23 +95,14 @@ export class Auth extends React.Component {
                 <form className="form-signin" onSubmit={this.onSubmit}>
                     <h2 className="form-signin-heading">Sample</h2>
                     <label className="sr-only">Email address</label>
-                    <input type="input" name="userName" className="form-control" placeholder="Sample ID" onChange={this.onChange} />
+                    <input type="input" name="userId" className="form-control" placeholder="Sample ID" onChange={this.onChange} disabled={this.state.disabled} />
                     <label className="sr-only">Password</label>
-                    <input type="password" name="password" className="form-control" placeholder="Password" onChange={this.onChange} />
-                    <button type="submit" className="btn btn-lg btn-primary btn-block">Sign In <i className="fa fa-sign-in"></i></button>
-                    <span className="error">{this.state.message}</span>
+                    <input type="password" name="password" className="form-control" placeholder="Password" onChange={this.onChange} disabled={this.state.disabled} />
+                    <button type="submit" className="btn btn-lg btn-primary btn-block" disabled={this.state.disabled}>Sign In <i className="fa fa-sign-in"></i></button>
+                    <span hidden={!this.state.disabled}><i className="fa fa-spinner fa-spin fa-2x"></i> Verify access info...</span>
+                    <span className="error" hidden={this.state.disabled}>{this.state.message}</span>
                 </form>
-                <ToastContainer
-                    position="top-left"
-                    autoClose={10000}
-                    hideProgressBar={false}
-                    newestOnTop
-                    closeOnClick
-                    rtl={false}
-                    pauseOnVisibilityChange
-                    draggable
-                    pauseOnHover
-                />
+
             </div>
         );
     }

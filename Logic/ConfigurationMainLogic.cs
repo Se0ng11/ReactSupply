@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReactSupply.Bundles;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
@@ -11,7 +12,11 @@ namespace ReactSupply.Logic
 {
     public class ConfigurationMainLogic : BaseLogic, IConfig 
     {
-        public ConfigurationMainLogic(SupplyChainContext context) => _context = context;
+        public ConfigurationMainLogic(SupplyChainContext context)
+            :base(context)
+        {
+
+        }
 
         public async Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
         {
@@ -68,9 +73,10 @@ namespace ReactSupply.Logic
             {
                 rm.Status = "Failed";
                 rm.Result = ex.Message;
+                _Logger.Error(ex);
             }
 
-            return ConvertToJSON(rm);
+            return Tools.ConvertToJSON(rm);
         }
 
         public async Task<string> SelectAllDataAsync()
@@ -87,10 +93,11 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public async Task<string> SelectHeader()
@@ -132,10 +139,11 @@ namespace ReactSupply.Logic
 
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public string SelectSchemaHeaderSync()
@@ -166,11 +174,12 @@ namespace ReactSupply.Logic
             }
 
             catch (Exception ex)
-            {   
+            {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
             //throw new NotImplementedException();
         }
     }

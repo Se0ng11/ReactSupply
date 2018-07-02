@@ -55,3 +55,8 @@ body {
     font-weight: bold;
     font-size: 15px;
 }
+
+.grid-btn-left {
+    position: relative;
+    float: left;
+}

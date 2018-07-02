@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ReactSupply.Bundles;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
 using System;
@@ -10,7 +11,11 @@ namespace ReactSupply.Logic
 {
     public class SubMenuLogic : BaseLogic, IConfig
     {
-        public SubMenuLogic(SupplyChainContext context) => _context = context;
+        public SubMenuLogic(SupplyChainContext context)
+            :base(context)
+        {
+
+        }
 
         public Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
         {
@@ -21,7 +26,7 @@ namespace ReactSupply.Logic
         {
             await Task.Run(() => SelectAsList());
 
-            return ConvertToJSON(SelectAsList().Result);
+            return Tools.ConvertToJSON(SelectAsList().Result);
         }
 
         public string SelectVisibleData()
@@ -35,10 +40,11 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public string SelectSchemaHeaderSync()
@@ -59,6 +65,7 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
             return lst;

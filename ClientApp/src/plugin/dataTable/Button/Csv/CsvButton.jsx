@@ -3,7 +3,7 @@ import { CSVLink } from 'react-csv';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-export class Csv extends Component {
+export class CsvButton extends Component {
 
     render() {
 
@@ -14,7 +14,7 @@ export class Csv extends Component {
     }
 }   
 
-Csv.propTypes  = {
+CsvButton.propTypes  = {
     header: PropTypes.array,
     body: PropTypes.array
 }

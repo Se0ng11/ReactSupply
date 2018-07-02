@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ReactSupply.Bundles;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
@@ -19,113 +20,112 @@ namespace ReactSupply.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ResponseMessage _responseMessage = new ResponseMessage();
+        private readonly SettingLogic _setting;
 
         public AuthController(SupplyChainContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             ILogger<HistoryController> logger)
-            : base(context, userManager, signInManager, logger)
+            :base(context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+
+            _setting = new SettingLogic(_context);
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<JsonResult> LoginAsync([FromBody]LoginViewModel model)
+        public async Task<string> LoginAsync([FromBody]LoginViewModel model)
         {
             try
             {
-                ApplicationUser user = await _userManager.FindByNameAsync(model.UserName);
-                
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-                {
-                    //var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Const.COMPANYNAME, Static.Const.REFRESHTOKEN);
-                    var token = new JwtTokenLogic().GenerateJwtToken(model.UserName, "", out string outRefreshToken);
-                 
-                    await _userManager.SetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN, outRefreshToken);
-                    //await _signInManager.SignInAsync(user, true);
-                    //var s = await _signInManager.CreateUserPrincipalAsync(user);
+                bool isSuper = model.UserId == _setting.GetSuperId();
+                ApplicationUser user = await _userManager.FindByNameAsync(model.UserId);
 
-                    _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
+                if (user != null || isSuper)
+                {
+                    var token = Tools.GenerateJwtToken(_setting, model.UserId, "", isSuper, out string outRefreshToken);
+
+                    if (user != null && !await _userManager.IsLockedOutAsync(user))
+                    { 
+                        await _userManager.SetAuthenticationTokenAsync(user, Messages.COMPANYNAME, Messages.REFRESHTOKEN, outRefreshToken);
+                   
+                    }
+
+                    _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
                     _responseMessage.Result = token;
                 }
                 else
                 {
-                    _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                    _responseMessage.Result = Static.Messages.LOGININFO;
+                    _responseMessage.Status = Status.MessageType.FAILED.ToString();
+                    _responseMessage.Result = Messages.LOGININFO;
                 }
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
+                _responseMessage.Status = Status.MessageType.FAILED.ToString();
                 _responseMessage.Result = ex.Message;
             }
           
-            return FormatJSON(_responseMessage);
+            return Tools.ConvertToJSON(_responseMessage);
         }
 
         [HttpPost("[action]")]
-        public async Task<JsonResult> RegisterAsync([FromBody]RegisterViewModel model)
-        {
-            try
-            {
-                ApplicationUser user = new ApplicationUser
-                {
-                    UserName = model.UserName,
-                    Email = model.Email,
-                    EmailConfirmed = true
-                };
-
-                var result = await _userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
-                }
-                else
-                {
-                    string message = "";
-                    foreach(var error in result.Errors)
-                    {
-                        message += error.Description;
-                    }
-                    _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                    _responseMessage.Result = message;
-
-                }
-
-            }
-            catch(Exception ex)
-            {
-                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                _responseMessage.Result = ex.Message;
-            }
-
-            return FormatJSON(_responseMessage);
-        }
-
-        [HttpPost("[action]")]
-        public async Task<JsonResult> Logout([FromBody] JwtTokenResponse token)
+        public async Task<string> Logout([FromBody] JwtTokenResponse token)
         {
             ApplicationUser user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
 
-            if (token.Refresh == currentRefresh)
+            if (user == null && token.UserId == _setting.GetSuperId())
             {
-                var deletedToken = await _userManager.RemoveAuthenticationTokenAsync(user, Static.Messages.COMPANYNAME, Static.Messages.REFRESHTOKEN);
-
-                if (deletedToken.Succeeded)
-                {
-                    _responseMessage.Status = Static.Response.MessageType.SUCCESS.ToString();
-                }
+                _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
             }
             else
             {
-                _responseMessage.Status = Static.Response.MessageType.FAILED.ToString();
-                _responseMessage.Result = Static.Messages.UNAUTHORIZED;
+                var currentRefresh = await _userManager.GetAuthenticationTokenAsync(user, Messages.COMPANYNAME, Messages.REFRESHTOKEN);
+
+                if (token.Refresh == currentRefresh)
+                {
+                    var deletedToken = await _userManager.RemoveAuthenticationTokenAsync(user, Messages.COMPANYNAME, Messages.REFRESHTOKEN);
+
+                    if (deletedToken.Succeeded)
+                    {
+                        _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
+                    }
+                }
+                else
+                {
+                    _responseMessage.Status = Status.MessageType.FAILED.ToString();
+                    _responseMessage.Result = Messages.UNAUTHORIZED;
+                }
             }
-            return FormatJSON(_responseMessage);
+
+         
+            return Tools.ConvertToJSON(_responseMessage);
         }
+
+        //private void CallADAPI(string id, string password)
+        //{
+
+        //    System.Net.HttpWebRequest request = (HttpWebRequest)WebRequest.Create(@"http://ngc-devvm1:8086/api/login/login");
+        //    request.Method = "POST";
+        //    request.ContentType = "application/json";
+        //    var model = new
+        //    {
+        //        AppId = "Rr0eExUJ0zlvXr02",
+        //        UserId = id,
+        //        Password = password
+        //    };
+
+        //    using (var sw = new StreamWriter(request.GetRequestStream()))
+        //    {
+        //        string json = JsonConvert.SerializeObject(model);
+        //        sw.Write(json);
+        //        sw.Flush();
+        //    }
+        //    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+        //}
     }
+   
 }

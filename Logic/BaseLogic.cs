@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NLog;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
 
@@ -6,14 +7,14 @@ namespace ReactSupply.Logic
 {
     public class BaseLogic
     {
-        protected SupplyChainContext _context;
+        protected readonly SupplyChainContext _context;
         protected ResponseMessage rm = new ResponseMessage();
+        protected static Logger _Logger { get; set; } = LogManager.GetCurrentClassLogger();
 
-        public string ConvertToJSON(object result)
+        public BaseLogic(SupplyChainContext context)
         {
-            return JsonConvert.SerializeObject(result, Formatting.None, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            _context = context;
         }
-
         public ReactDataFormatter FixedIndexColumn()
         {
             return new ReactDataFormatter

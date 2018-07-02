@@ -9,7 +9,10 @@ namespace ReactSupply.Logic
 {
     public class SupplyRecordLogic: BaseLogic, IConfig
     {
-        public SupplyRecordLogic(SupplyChainContext context) => _context = context;
+        public SupplyRecordLogic(SupplyChainContext context)
+            :base(context)
+        {
+        }
 
         public async Task<string> SelectAllDataAsync()
         {
@@ -25,6 +28,7 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
@@ -59,6 +63,7 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 

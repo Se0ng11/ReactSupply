@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReactSupply.Bundles;
 using ReactSupply.Interface;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
@@ -18,19 +19,15 @@ namespace ReactSupply.Controllers
     [Route("api/Home")]
     public class HomeController : BaseController
     {
-        private SupplyChainContext _context;
 
         public HomeController(SupplyChainContext context,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
             ILogger<HistoryController> logger)
-            : base(context, userManager, signInManager, logger)
+            :base(context)
         {
-            _context = context;
         }
 
         [HttpGet("[action]")]
-        public JsonResult GetSupplyRecord()
+        public string GetSupplyRecord()
         {
             var obj = new ConfigurationMainLogic(_context);
             var obj1 = new SupplyRecordLogic(_context);
@@ -40,11 +37,11 @@ namespace ReactSupply.Controllers
             Task.WhenAll(data, data1);
 
             var result = new TableFormatter { Header = data.Result, Body = data1.Result };
-            return FormatJSON(result);
+            return Tools.ConvertToJSON(result);
         }
 
         [HttpGet("[action]")]
-        public JsonResult GetConfiguration()
+        public string GetConfiguration()
         {
             var obj = new ConfigurationMainLogic(_context);
             var data = obj.SelectSchemaHeaderSync();
@@ -54,7 +51,7 @@ namespace ReactSupply.Controllers
 
             var result = new TableFormatter { Header = data, Body = data1.Result };
 
-            return FormatJSON(result);
+            return Tools.ConvertToJSON(result);
         }
 
 

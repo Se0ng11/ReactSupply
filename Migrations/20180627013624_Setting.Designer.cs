@@ -11,9 +11,10 @@ using System;
 namespace ReactSupply.Migrations
 {
     [DbContext(typeof(SupplyChainContext))]
-    partial class SupplyChainContextModelSnapshot : ModelSnapshot
+    [Migration("20180627013624_Setting")]
+    partial class Setting
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

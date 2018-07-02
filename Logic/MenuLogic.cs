@@ -5,12 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using ReactSupply.Bundles;
 
 namespace ReactSupply.Logic
 {
     public class MenuLogic : BaseLogic, IConfig
     {
-        public MenuLogic(SupplyChainContext context) => _context = context;
+        public MenuLogic(SupplyChainContext context)
+            :base(context)
+        {
+
+        }
 
         public Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
         {
@@ -21,7 +26,7 @@ namespace ReactSupply.Logic
         {
             await Task.Run(()=> SelectAsList());
 
-            return ConvertToJSON(SelectAsList().Result);
+            return Tools.ConvertToJSON(SelectAsList().Result);
         }
 
         public string SelectVisibleData()
@@ -36,10 +41,11 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public string SelectSchemaHeaderSync()
@@ -61,6 +67,7 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
             return lst;

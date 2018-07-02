@@ -23,6 +23,7 @@ export default class Top extends React.Component {
         const self = this;
         axios.post("/api/Auth/Logout",
             {
+                UserId: localStorage.getItem("user"),
                 Refresh: localStorage.getItem("refresh")
             }
         ).then((response) => {
@@ -76,7 +77,7 @@ export default class Top extends React.Component {
                             <button type="button" className="btn btn-danger btn-block" onClick={() => this.onSignOut()}>Sign Out <i className="fa fa-sign-out"></i></button>
                         </Navbar.Form>
                         <div className="navbar-form navbar-right">
-                            <h5><i className="fa fa-user" aria-hidden="true"></i> { user }</h5>
+                            <h5><i className="fa fa-user" aria-hidden="true"></i> { user } </h5>
                         </div>
                     </Navbar.Collapse>
                 </Navbar>

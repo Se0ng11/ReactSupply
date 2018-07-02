@@ -3,6 +3,8 @@ import { Route } from 'react-router';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuList';
+import { ToastContainer } from 'react-toastify';
+import ErrorBoundary from './plugin/error/ErrorBoundary';
 //import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 //const PageFade = (props) => (
@@ -28,25 +30,35 @@ const MainRoute = ({ component: Component, ...rest }) => (
 
 MainRoute.displayName = "MainRoute";
 
-
-
-
 export default class App extends Component {    
     displayName = "App";
     render() {
         return (
             <div>
-                <Switch location={this.props.location}>
-                    <Route exact path='/' component={Auth} />
-                    <MainRoute exact path='/home' component={Home} />
-                    <MainRoute exact path='/data' component={Sample} />
-                    <MainRoute exact path='/report' component={Report} />
-                    <MainRoute exact path='/report/:id' component={Report} />
-                    <MainRoute exact path='/config' component={Config} />
-                    <MainRoute exact path='/config/:id' component={Config} />
-                    <MainRoute exact component={NotFound} />
-                </Switch>
-              
+                <ErrorBoundary>
+                    <Switch location={this.props.location}>
+                        <Route exact path='/' component={Auth} />
+                        <MainRoute exact path='/home' component={Home} />
+                        <MainRoute exact path='/data' component={Sample} />
+                        <MainRoute exact path='/data/:id' component={Sample} />
+                        <MainRoute exact path='/report' component={Report} />
+                        <MainRoute exact path='/report/:id' component={Report} />
+                        <MainRoute exact path='/config' component={Config} />
+                        <MainRoute exact path='/config/:id' component={Config} />
+                        <MainRoute exact component={NotFound} />
+                    </Switch>
+                    <ToastContainer
+                        position="top-left"
+                        autoClose={10000}
+                        hideProgressBar={false}
+                        newestOnTop
+                        closeOnClick
+                        rtl={false}
+                        pauseOnVisibilityChange
+                        draggable
+                        pauseOnHover
+                    />
+                </ErrorBoundary>
             </div>
         );
     }

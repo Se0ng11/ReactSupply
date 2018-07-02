@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ReactSupply.Bundles;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
+using ReactSupply.Models.Entity;
 
 namespace ReactSupply.Controllers
 {
@@ -12,15 +14,12 @@ namespace ReactSupply.Controllers
     [Route("api/Menu")]
     public class MenuController : BaseController
     {
-        private readonly SupplyChainContext _context;
         private readonly ILogger<HistoryController> _logger;
 
         public MenuController(SupplyChainContext context,
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
-            ILogger<HistoryController> logger) :base(context, userManager, signInManager,logger)
+            ILogger<HistoryController> logger)
+            :base(context)
         {
-            _context = context;
             _logger = logger;
         }
 
@@ -44,7 +43,7 @@ namespace ReactSupply.Controllers
 
 
         [HttpGet("[action]")]
-        public JsonResult GetMenu()
+        public string GetMenu()
         {
             var obj = new MenuLogic(_context);
             var obj1 = new SubMenuLogic(_context);
@@ -54,7 +53,7 @@ namespace ReactSupply.Controllers
           
             var format = new { top = data, left= data1 };
 
-            return FormatJSON(format);
+            return Tools.ConvertToJSON(format);
         }
 
     }

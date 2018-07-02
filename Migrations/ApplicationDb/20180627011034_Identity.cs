@@ -1,10 +1,11 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+using System.Collections.Generic;
 
-namespace Identity.Data.Migrations
+namespace ReactSupply.Migrations.ApplicationDb
 {
-    public partial class CreateIdentitySchema : Migration
+    public partial class Identity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,9 +14,9 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    ConcurrencyStamp = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(nullable: true)
+                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,20 +28,20 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    UserName = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
-                    Email = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(nullable: false),
-                    PasswordHash = table.Column<string>(nullable: true),
-                    SecurityStamp = table.Column<string>(nullable: true),
+                    AccessFailedCount = table.Column<int>(nullable: false),
                     ConcurrencyStamp = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(nullable: false),
+                    LockoutEnabled = table.Column<bool>(nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
+                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
+                    PasswordHash = table.Column<string>(nullable: true),
                     PhoneNumber = table.Column<string>(nullable: true),
                     PhoneNumberConfirmed = table.Column<bool>(nullable: false),
+                    SecurityStamp = table.Column<string>(nullable: true),
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
-                    LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    UserName = table.Column<string>(maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -53,9 +54,9 @@ namespace Identity.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    RoleId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true)
+                    ClaimValue = table.Column<string>(nullable: true),
+                    RoleId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -74,9 +75,9 @@ namespace Identity.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<string>(nullable: false),
                     ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true)
+                    ClaimValue = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -93,8 +94,8 @@ namespace Identity.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    ProviderKey = table.Column<string>(nullable: false),
                     ProviderDisplayName = table.Column<string>(nullable: true),
                     UserId = table.Column<string>(nullable: false)
                 },
@@ -138,8 +139,8 @@ namespace Identity.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(nullable: false),
-                    LoginProvider = table.Column<string>(maxLength: 128, nullable: false),
-                    Name = table.Column<string>(maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
                     Value = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

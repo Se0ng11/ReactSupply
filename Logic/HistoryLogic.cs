@@ -6,12 +6,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReactSupply.Bundles;
 
 namespace ReactSupply.Logic
 {
     public class HistoryLogic : BaseLogic, IConfig
     {
-        public HistoryLogic(SupplyChainContext context) => _context = context;
+        public HistoryLogic(SupplyChainContext context)
+            :base(context)
+        {
+
+        }
 
         public async Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
         {
@@ -33,11 +38,12 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 rm.Status = "Failed";
                 rm.Result = ex.Message;
             }
 
-            return ConvertToJSON(rm);
+            return Tools.ConvertToJSON(rm);
         }
 
         public async Task<string> SelectAllDataAsync()
@@ -52,10 +58,11 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public string SelectSchemaHeaderSync()
@@ -87,10 +94,11 @@ namespace ReactSupply.Logic
 
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
 
         public async Task<String> SelectSpecificdata(string identifier)
@@ -107,10 +115,11 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
+                _Logger.Error(ex);
                 throw ex;
             }
 
-            return ConvertToJSON(lst);
+            return Tools.ConvertToJSON(lst);
         }
     }
 }

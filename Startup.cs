@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using ReactSupply.Models.DB;
+using ReactSupply.Models.Entity;
 using System;
 using System.Text;
 
@@ -56,10 +57,10 @@ namespace ReactSupply
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidAudience = Static.Messages.COMPANY_WEBADDRESS,
-                    ValidIssuer = Static.Messages.COMPANY_WEBADDRESS,
+                    ValidAudience = Bundles.Messages.COMPANY_WEBADDRESS,
+                    ValidIssuer = Bundles.Messages.COMPANY_WEBADDRESS,
                     ClockSkew = TimeSpan.FromMinutes(0),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Static.Messages.ACCESS_KEY))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Bundles.Messages.ACCESS_KEY))
                 };
             });
 

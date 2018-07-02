@@ -4,11 +4,10 @@ import ReactDataGrid, { Row, Cell } from 'react-data-grid';
 import axios from 'axios';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
-import ErrorBoundary from '../error/ErrorBoundary';
 import { DatePickerEditor } from './Editors';
 import { BooleanFormatter, ModalFormatter, EmptyRowFormatter } from './Formatter';
-import { Csv } from './Exporter/Csv';
-import { ToastContainer, toast } from 'react-toastify';
+import { CsvButton } from './Button';
+import { toast } from 'react-toastify';
 
 const { Toolbar, Editors,  Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 //Formatters,
@@ -47,6 +46,8 @@ export default class ReactGrids extends Component {
                 body:[]
             }
         };
+
+        this.onClickShowModal = this.onClickShowModal.bind(this);
     }
 
     componentDidMount() {
@@ -70,8 +71,11 @@ export default class ReactGrids extends Component {
              
             })
             .catch((error) => {
-                let msg = "ReactGrids() " + error.message + ": " + error.response.statusText; 
-                toast.error(msg);
+
+                if (error.response !== undefined) {
+                    let msg = "ReactGrids() " + error.message + ": " + error.response.statusText;
+                    toast.error(msg);
+                }
             });
     }
 
@@ -123,19 +127,27 @@ export default class ReactGrids extends Component {
 
     postToServer = (aX, vC) => {
         const self = this;
-        axios.put(this.props.postApi, 
-        {
-            identifier: aX,
-            updated: vC
-        })
-        .then((response) => {
-            self.setState({ cellCss: "border-success" });
-        })
-        .catch((error) => {
-            let msg = "postToServer() " + error.message + ": " + error.response.statusText; 
-            toast.error(msg);
-            self.setState({ cellCss: "border-failed" });
-        });
+        if (this.props.postApi !== "") {
+            axios.put(this.props.postApi,
+                {
+                    identifier: aX,
+                    updated: vC
+                })
+                .then((response) => {
+                    self.setState({ cellCss: "border-success" });
+                })
+                .catch((error) => {
+
+                    if (error.response !== undefined) {
+                        let msg = "ReactGrids() " + error.message + ": " + error.response.statusText;
+                        toast.error(msg);
+                    } else {
+                        toast.error(error.message);
+                    }
+                 
+                    self.setState({ cellCss: "border-failed" });
+                });
+        }
     }
 
     handleGridSort = (sortColumn, sortDirection) => {
@@ -265,11 +277,45 @@ export default class ReactGrids extends Component {
                 });
 
             }).catch((error) => {
+                console.log(error);
                 let msg = "postToServer() " + error.message + ": " + error.response.statusText; 
 
                 toast.error(msg);
             });
         }
+    }
+
+    onClickShowModal = () => {
+        const self = this;
+        self.setState({
+            isModal: true
+        });
+    }
+
+    ToolbarButton = () => {
+        return (
+            <div className="grid-btn-left" >
+                {this.props.gridButton}
+              
+                {
+                    this.props.isCsvButton &&
+                    <CsvButton header={this.state.header} body={this.state.rows} />
+                }
+            </div>
+        )
+    }
+
+//     {
+//    this.props.isRoleButton &&
+//        <RoleButton onClick={this.props.onClick} />
+//}
+//{
+//    this.props.isAddButton &&
+//        <AddButton onClick={this.props.onClick} />
+//}
+
+    handleAddRow =() =>{
+
     }
 
     render() {
@@ -280,50 +326,36 @@ export default class ReactGrids extends Component {
             apiData = this.renderStringToObject(apiData);
             return (
                 <div>
-                    <ErrorBoundary>
-                        <RowContext.Provider value={this.state.cellRow}>
-                            <ColContext.Provider value={this.state.cellCol}>
-                                <ColorContext.Provider value={this.state.cellCss}>
-                                    <ReactDataGrid
-                                        onGridSort={this.handleGridSort}
-                                        enableCellSelect={true}
-                                        columns={apiData}
-                                        rowGetter={this.rowGetter}
-                                        rowsCount={this.getSize()}
-                                        headerRowHeight={this.props.isDoubleHeader?100:0}
-                                        minHeight={this.state.height}
-                                        cellNavigationMode="changeRow"
-                                        onGridRowsUpdated={this.handleGridRowsUpdated}
-                                        onRowDoubleClick={this.onDoubleClick}
-                                        toolbar={<Toolbar enableFilter={true} children={<Csv header={this.state.header} body={this.state.rows} />} />}
-                                        onAddFilter={this.handleFilterChange}
-                                        getValidFilterValues={this.getValidFilterValues}
-                                        onClearFilters={this.onClearFilters}
-                                        emptyRowsView={EmptyRowFormatter}
-                                        rowRenderer={RowRenderer}
-                                    />
-                                </ColorContext.Provider>
-                            </ColContext.Provider>
-                        </RowContext.Provider>
-                    </ErrorBoundary>
+                    <RowContext.Provider value={this.state.cellRow}>
+                        <ColContext.Provider value={this.state.cellCol}>
+                            <ColorContext.Provider value={this.state.cellCss}>
+                                <ReactDataGrid
+                                    onGridSort={this.handleGridSort}
+                                    enableCellSelect={true}
+                                    columns={apiData}
+                                    rowGetter={this.rowGetter}
+                                    rowsCount={this.getSize()}
+                                    headerRowHeight={this.props.isDoubleHeader?100:0}
+                                    minHeight={this.state.height}
+                                    cellNavigationMode="changeRow"
+                                    onGridRowsUpdated={this.handleGridRowsUpdated}
+                                    onRowDoubleClick={this.onDoubleClick}
+                                    toolbar={<Toolbar enableFilter={true} children={this.ToolbarButton()} />}
+                                    onAddFilter={this.handleFilterChange}
+                                    getValidFilterValues={this.getValidFilterValues}
+                                    onClearFilters={this.onClearFilters}
+                                    emptyRowsView={EmptyRowFormatter}
+                                    rowRenderer={RowRenderer}
+                                />
+                            </ColorContext.Provider>
+                        </ColContext.Provider>
+                    </RowContext.Provider>
                     <ModalFormatter show={this.state.isModal} onHide={isClose} />
-                    <ToastContainer
-                        position="top-left"
-                        autoClose={10000}
-                        hideProgressBar={false}
-                        newestOnTop
-                        closeOnClick
-                        rtl={false}
-                        pauseOnVisibilityChange
-                        draggable
-                        pauseOnHover
-                    />
                 </div>
             )
         }
 
         return (<div>Loading....</div>);
-
     }
 }
 
@@ -331,9 +363,10 @@ ReactGrids.propTypes = {
     getApi: PropTypes.string,
     postApi: PropTypes.string,
     isBasic: PropTypes.bool,
-    isDoubleHeader: PropTypes.bool
+    isDoubleHeader: PropTypes.bool,
+    isCsvButton: PropTypes.bool,
+    gridButton: PropTypes.element
 }
-
 
 class HeaderGroup extends Component {
     render() {
@@ -379,7 +412,6 @@ class CellRenderer extends Component {
         );
     }
 }
-
 
 class RowRenderer extends Component {
 

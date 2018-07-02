@@ -41,18 +41,16 @@ export class ModalFormatter extends React.Component {
                     bsSize="large"
                     aria-labelledby="contained-modal-title-lg">
                     <Modal.Header closeButton>
-                        <Modal.Title id="contained-modal-title-lg">History</Modal.Title>
+                        <Modal.Title id="contained-modal-title-lg">{this.props.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        
-                        <ReactDataGrid
-                            columns={this._columns}
-                            rowGetter={this.rowGetter}
-                            rowsCount={this._rows.length}
-                            minHeight={200} />
+                        <form>
+                            {this.props.content}
+                        </form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={this.props.onHide}>Close</Button>
+                        <Button onClick={this.props.onHide}><i className="fa fa-pencil"></i> Save</Button>
+                        <Button onClick={this.props.onHide}>Close <i className="fa fa-sign-out"></i></Button>
                     </Modal.Footer>
                 </Modal>
 
@@ -62,3 +60,9 @@ export class ModalFormatter extends React.Component {
         )
     }
 }
+
+//<ReactDataGrid
+//    columns={this._columns}
+//    rowGetter={this.rowGetter}
+//    rowsCount={this._rows.length}
+//    minHeight={200} />
