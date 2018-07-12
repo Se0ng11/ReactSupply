@@ -5,5 +5,6 @@ namespace ReactSupply.Models.Entity
 {
     public class ApplicationUser: IdentityUser
     {
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 ﻿import React, { Component } from 'react'; 
-import ReactGrids from '../../plugin/dataTable/ReactGrids';
-import { Users } from './child';
+import { Users, Fields } from './child';
 
 export class Config extends Component {
     constructor(props) {
@@ -14,7 +13,8 @@ export class Config extends Component {
 
     render() {
         let page = this.props.match.params.id;
-        //4001
+        //4001 ,lu
+
         //4002
         //4003
         //4004
@@ -24,13 +24,7 @@ export class Config extends Component {
             )
         } else if (page === "4003") {
             return (
-                <div>
-                    <ReactGrids
-                        getApi="api/Home/GetConfiguration"
-                        postApi="api/Home/PostSingleConfigurationField"
-                        isBasic={true}
-                        isDoubleHeader={true} />
-                </div>
+                <Fields />
             );
         } else if (page === "4001") {
 

@@ -1,7 +1,12 @@
 ﻿import React from 'react';
+import { Well } from 'react-bootstrap';
 
 export class EmptyRowFormatter extends React.Component {
     render() {
-        return (<div>Please wait while data is loading...</div>);
+        return (
+            <div>
+                <Well bsSize="large">No data</Well>
+            </div>
+        );
     }
 }

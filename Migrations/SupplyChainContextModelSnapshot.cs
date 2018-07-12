@@ -77,6 +77,8 @@ namespace ReactSupply.Migrations
 
                     b.Property<bool>("IsFilterable");
 
+                    b.Property<bool>("IsInlineField");
+
                     b.Property<bool>("IsLocked");
 
                     b.Property<bool>("IsRequired");

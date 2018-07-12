@@ -16,7 +16,11 @@
 }
 
 .react-grid-HeaderCell-sortable{
-    min-height: 80px;
+    /*min-height: 80px;*/
+}
+
+.left-align {
+    text-align:left !important;
 }
 
 .drag-handle {
@@ -31,8 +35,16 @@
     background: #3498db !important;
 }
 
+.dark-blue {
+    background: #2980b9 !important;
+}
+
 .red {
     background: #e74c3c !important;
+}
+
+.light-purple {
+    background: #9b59b6 !important;
 }
 
 .purple {
@@ -53,6 +65,18 @@
 
 .silver {
     background: #bdc3c7 !important;
+}
+
+.cloud {
+    background: #ecf0f1 !important;
+}
+
+.midnightblue {
+    background: #2c3e50 !important;
+}
+
+.steelblue {
+    background: steelblue !important;
 }
 
 .history {
@@ -84,4 +108,17 @@
 
 .false {
     color: red;
+}
+
+.tools {
+    width:100% !important;
+}
+
+.grid-btn-right {
+    position: relative;
+    float: right;
+}
+
+.tools button:first-child{
+    float: right;
 }

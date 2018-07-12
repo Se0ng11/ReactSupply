@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using NLog;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
@@ -14,6 +15,7 @@ namespace ReactSupply.Logic
         public BaseLogic(SupplyChainContext context)
         {
             _context = context;
+       
         }
         public ReactDataFormatter FixedIndexColumn()
         {

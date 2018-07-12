@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ReactSupply.Bundles;
+using ReactSupply.Utils;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
 using System;
@@ -15,11 +15,6 @@ namespace ReactSupply.Logic
             :base(context)
         {
 
-        }
-
-        public Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<string> SelectAllDataAsync()
@@ -69,6 +64,11 @@ namespace ReactSupply.Logic
                 throw ex;
             }
             return lst;
+        }
+
+        public Task<Status.MessageType> PostDoubleKeyFieldAsync(string indentifier, string identifier1, string updated, string user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

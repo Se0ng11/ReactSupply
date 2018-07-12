@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ReactSupply.Bundles;
 using ReactSupply.Interface;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
+using ReactSupply.Utils;
 using System.Threading.Tasks;
 
 namespace ReactSupply.Controllers
@@ -19,11 +18,13 @@ namespace ReactSupply.Controllers
     [Route("api/Home")]
     public class HomeController : BaseController
     {
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(SupplyChainContext context,
-            ILogger<HistoryController> logger)
+            ILogger<HomeController> logger)
             :base(context)
         {
+            _logger = logger;
         }
 
         [HttpGet("[action]")]
@@ -55,35 +56,50 @@ namespace ReactSupply.Controllers
         }
 
 
-        [HttpPut("[action]")]
-        public string PostSingleSupplyRecordField([FromBody]RequestData requestData)
+        [HttpPost("[action]")]
+        public string PostSupplyRecords([FromBody]RequestData modal)
         {
             var obj = new SupplyRecordLogic(_context);
-            return PostData(requestData, obj);
+
+            var result = PostData(modal, obj);
+            
+            if (result == Status.MessageType.SUCCESS)
+            {
+                _responseMessage.Status = result.ToString();
+                _responseMessage.Data = Messages.SAVESUCCESS;
+            }
+            else
+            {
+                _responseMessage.Status = result.ToString();
+                _responseMessage.Data = Messages.SAVESUCCESS;
+            }
+
+            return Tools.ConvertToJSON(_responseMessage);
         }
 
 
-        [HttpPut("[action]")]
-        public string PostSingleConfigurationField([FromBody]RequestData requestData)
+        [HttpPost("[action]")]
+        public string PostSingleConfigurationField([FromBody]RequestData modal)
         {
             var obj = new ConfigurationMainLogic(_context);
-            return PostData(requestData, obj);
+            var result = PostData(modal, obj);
+
+            if (result == Status.MessageType.SUCCESS)
+            {
+                _responseMessage.Status = result.ToString();
+                _responseMessage.Data = Messages.SAVESUCCESS;
+            }
+            else
+            {
+                _responseMessage.Status = result.ToString();
+                _responseMessage.Data = Messages.SAVESUCCESS;
+            }
+
+            return Tools.ConvertToJSON(_responseMessage);
         }
-        
-        private string PostData([FromBody]RequestData requestData, IConfig config)
-        {
-            var s = JsonConvert.DeserializeObject(requestData.updated);
-            var keyName = ((JObject)s).First.Path;
-            var valueName = ((JObject)s).First.Last.ToString();
 
-            var result = config.PostSingleFieldAsync(requestData.identifier, keyName, valueName);
 
-            Task.WaitAll(result);
 
-            return result.Result;
-        }
-
-      
 
     }
 }

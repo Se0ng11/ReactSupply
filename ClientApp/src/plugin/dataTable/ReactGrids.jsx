@@ -5,9 +5,10 @@ import axios from 'axios';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
 import { DatePickerEditor } from './Editors';
-import { BooleanFormatter, ModalFormatter, EmptyRowFormatter } from './Formatter';
+import { BooleanFormatter, EmptyRowFormatter, HistoryModal, GroupModal } from './Formatter';
 import { CsvButton } from './Button';
 import { toast } from 'react-toastify';
+import moment from 'moment';
 
 const { Toolbar, Editors,  Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 //Formatters,
@@ -40,43 +41,31 @@ export default class ReactGrids extends Component {
             cellRow: null,
             cellCol: null,
             height: window.screen.availHeight - 250,
-            isModal: false,
-            modalData: {
+            isHistoryModal: false,
+            isGroupModal: false,
+            isGroupClicked: false,
+            historyData: {
                 header: [],
                 body:[]
+            },
+            groupData: {
+                header: [],
+                body: []
             }
         };
 
-        this.onClickShowModal = this.onClickShowModal.bind(this);
+        //this.onClickShowModal = this.onClickShowModal.bind(this);
     }
 
     componentDidMount() {
-        const self = this;    
-        axios.get(this.props.getApi,
-        {
-            cancelToken: new CancelToken(function executor(c) {
-                cancel = c;
-            })
-        }).then((response) => {
-                let data = response.data;
-                let obj = JSON.parse(data);
-                let _header = JSON.parse(obj.Header);
-                let _rows = JSON.parse(obj.Body);
+        this.onLoad();
+    }
 
-                for (let i = 0; i <= _rows.length - 1; i++) {
-                    _rows[i].No = i + 1;
-                }
+    componentWillReceiveProps = (props) => {
 
-                self.setState({ header: _header, rows: _rows });
-             
-            })
-            .catch((error) => {
-
-                if (error.response !== undefined) {
-                    let msg = "ReactGrids() " + error.message + ": " + error.response.statusText;
-                    toast.error(msg);
-                }
-            });
+        if (this.props.refreshGrid) {
+            this.onLoad();
+        }
     }
 
     componentWillUnmount() {
@@ -90,8 +79,8 @@ export default class ReactGrids extends Component {
     };
 
     handleGridRowsUpdated = ({ cellKey, fromRow, toRow, updated, action, originRow }) => {
-        let rows = Selectors.getRows(this.state);
         var self = this;
+        let rows = Selectors.getRows(self.state);
 
         if (self.state.cellCss === "border-success") {
             self.setState({ cellCss: "" });
@@ -100,51 +89,54 @@ export default class ReactGrids extends Component {
         for (let i = fromRow; i <= toRow; i++) {
             let rowToUpdate = rows[i];
             let updatedRow = update(rowToUpdate, { $merge: updated });
-  
-            if (JSON.stringify(rowToUpdate) !== JSON.stringify(updatedRow))
+            let oldData = JSON.stringify(rowToUpdate);
+            let newData = JSON.stringify(updatedRow);
+
+            if (oldData !== newData)
             {
                 self.setState({ cellCss: "border-progress" });
                 rows[i] = updatedRow;
 
-                this.setState({
-                    cellRow: JSON.stringify(updatedRow),
+                self.setState({
+                    cellRow: newData,
                     cellCol: cellKey
                 })
 
-                if (this.props.isBasic)
-                {
-                    this.postToServer(updatedRow.ValueName, JSON.stringify(updated));
-                }
-                else
-                {
-                    this.postToServer(updatedRow.AX6SO, JSON.stringify(updated));
-                }
+                let id1 = self.props.identifier(updatedRow, 1);
+                let id2 = self.props.identifier(updatedRow, 2);
+                self.postToServer(id1, id2, JSON.stringify(updated));
             }
         }
-
-        this.setState({ rows });
+        self.setState({ rows });
     };
 
-    postToServer = (aX, vC) => {
+    postToServer = (id1, id2, updatedVal) => {
         const self = this;
-        if (this.props.postApi !== "") {
-            axios.put(this.props.postApi,
+        if (self.props.postApi !== "") {
+            axios.post(self.props.postApi,
                 {
-                    identifier: aX,
-                    updated: vC
+                    identifier: id1,
+                    identifier1: id2,
+                    updated: updatedVal
                 })
                 .then((response) => {
-                    self.setState({ cellCss: "border-success" });
+                    let data = JSON.parse(response.data);
+                    if (data.Status === "SUCCESS") {
+                        self.setState({ cellCss: "border-success" });
+                    } else {
+                        toast.error(data.Result);
+                        self.setState({ cellCss: "border-failed" });
+                    }
                 })
                 .catch((error) => {
 
                     if (error.response !== undefined) {
-                        let msg = "ReactGrids() " + error.message + ": " + error.response.statusText;
+                        let msg = error.message + ": " + error.response.statusText;
                         toast.error(msg);
                     } else {
                         toast.error(error.message);
                     }
-                 
+
                     self.setState({ cellCss: "border-failed" });
                 });
         }
@@ -216,14 +208,17 @@ export default class ReactGrids extends Component {
 
     renderControlToEditor = (ary) => {
 
-        if (ary.control === "date") {
+        if (ary.control === "date" && ary.editable) {
             ary.editor = <DatePickerEditor />;
         }
-        else if (ary.control.toLowerCase() === "boolean") {
+        else if (ary.control.toLowerCase() === "boolean" && ary.editable) {
             ary.editor = <DropDownEditor options={BoolItem} />
         }
-        else if (ary.control === "DropDown") {
-            ary.editor = <DropDownEditor options={ary.name === "ControlType"? ControlItem : ''} />;
+        else if (ary.control === "DropDown" && ary.editable) {
+            ary.editor = <DropDownEditor options={ary.name === "ControlType" ? ControlItem : ''} />;
+        }
+        else if (ary.control === "role") {
+            ary.editor = <DropDownEditor options={this.props.parentOptions} />;
         }
 
         return ary.editor;
@@ -232,10 +227,10 @@ export default class ReactGrids extends Component {
     renderStringToHeaderRenderer = (ary) => {
 
         if (ary.headerRenderer === undefined) {
-            if (ary.Group === undefined)
-                ary.Group = "";
+            //if (ary.Group === undefined)
+            //    ary.Group = "";
 
-            ary.headerRenderer = <HeaderGroup parent={ary.title} child={ary.name} isDoubleHeader={this.props.isDoubleHeader} />;
+            ary.headerRenderer = <HeaderGroup parent={ary.Group} child={ary.name} isDoubleHeader={this.props.isDoubleHeader} />;
         }
 
         return ary.headerRenderer;
@@ -250,14 +245,48 @@ export default class ReactGrids extends Component {
         return ary.formatter;
     }
 
+    onLoad = () => {
+        const self = this;
+
+        axios.get(this.props.getApi,
+            {
+                cancelToken: new CancelToken(function executor(c) {
+                    cancel = c;
+                })
+            }).then((response) => {
+                let data = response.data;
+                let obj = JSON.parse(data);
+                let _header = JSON.parse(obj.Header);
+                let _rows = "";
+                if (obj.Body !== "") {
+                    _rows = JSON.parse(obj.Body);
+
+                    for (let i = 0; i <= _rows.length - 1; i++) {
+                        _rows[i].No = i + 1;
+                    }
+                }
+                self.setState({ header: _header, rows: _rows });
+
+            })
+            .catch((error) => {
+
+                if (error.response !== undefined) {
+                    let msg = error.message + ": " + error.response.statusText;
+                    toast.error(msg);
+                }
+            });
+
+    }
+
     onDoubleClick = (rowIdx, row, column) => {
         if (column.control === "identity") {
             const self = this;
+            let identifier = self.props.identifier(row, 1);
 
             axios.get("api/History/GetHistory",
                 {
                     params: {
-                        identifier: row.AX6SO
+                        identifier: identifier
                     },
                     cancelToken: new CancelToken(function executor(c) {
                         cancel = c;
@@ -266,63 +295,112 @@ export default class ReactGrids extends Component {
             ).then((response) => {
                 let obj = JSON.parse(response.data);
                 let _header = JSON.parse(obj.Header);
-                let _rows = JSON.parse(obj.Body);
+                let _rows = "";
+
+                if (obj.Body !== "") {
+                    _rows = JSON.parse(obj.Body);
+                    for (let i = 0; i <= _rows.length - 1; i++) {
+                        _rows[i].No = i + 1;
+                        _rows[i].CreatedDate = moment(_rows[i].CreatedDate).format("DD/MM/YYYY hh:mm A");
+                    }
+                }
 
                 self.setState({
-                    isModal: true,
-                    modaldata: {
+                    isHistoryModal: true,
+                    historyData: {
                         header: _header,
                         body: _rows
                     }
                 });
 
             }).catch((error) => {
-                console.log(error);
-                let msg = "postToServer() " + error.message + ": " + error.response.statusText; 
+                let msg = error.message + ": " + error.response.statusText; 
 
                 toast.error(msg);
             });
         }
     }
 
-    onClickShowModal = () => {
-        const self = this;
-        self.setState({
-            isModal: true
+    onRowClick = (id, row, col) => {
+
+        if (id >= 0 && col.control === "identity") {
+
+            let header = this.state.header;
+            let role = localStorage.getItem("role");
+            let ary = [];
+            for (var i = 0; i <= header.length - 1; i++) {
+                let col = header[i];
+                if (col.Group === role && col.inlineField) {
+                    ary.push(col);
+                }
+            }
+            this.setState({
+                groupData: {
+                    header: ary,
+                    body: row
+                },
+                isGroupClicked: true
+            })
+        }
+    }
+
+    onGroupButtonClick = () => {
+        this.setState({
+            isGroupModal: true
         });
     }
 
+    onGroupCloseRefresh = (refresh) => {
+        let self = this;
+
+        self.setState({
+            isGroupModal: false
+        });
+
+        if (refresh) {
+            self.onLoad();
+        }
+    }
+
     ToolbarButton = () => {
+
+        let isMatch = false;
+        let role = "";
+        let roleColor = "";
+        if (this.props.isGroupButton) {
+            let header = this.state.header;
+            role = localStorage.getItem("role");
+            for (var i = 0; i <= header.length - 1; i++) {
+                let singleHeader = header[i];
+
+                if (singleHeader.Group === role) {
+                    isMatch = true;
+                    singleHeader.headerClass = (singleHeader.headerClass === undefined ? "steelblue" : singleHeader.headerClass);
+                    roleColor = "grid-btn-left btn fo-white " + singleHeader.headerClass;
+                    break;
+                }
+            }
+        }
+
         return (
-            <div className="grid-btn-left" >
-                {this.props.gridButton}
-              
-                {
-                    this.props.isCsvButton &&
+            <div>
+                <div className="grid-btn-right" >
+                    {this.props.gridButton}
                     <CsvButton header={this.state.header} body={this.state.rows} />
+                </div>
+                {
+                    (this.props.isGroupButton && isMatch) &&
+                    <button type="button" disabled={!this.state.isGroupClicked} className={roleColor} onClick={this.onGroupButtonClick}><i className="fa fa-pencil-square-o"></i> {role}</button>
                 }
             </div>
         )
     }
 
-//     {
-//    this.props.isRoleButton &&
-//        <RoleButton onClick={this.props.onClick} />
-//}
-//{
-//    this.props.isAddButton &&
-//        <AddButton onClick={this.props.onClick} />
-//}
-
-    handleAddRow =() =>{
-
-    }
-
     render() {
         let apiData = this.state.header;
-        let isClose = () => this.setState({ isModal: false });
+        let isHistoryClose = () => this.setState({ isHistoryModal: false });
 
-        if (apiData !== undefined) {
+        if (apiData !== undefined && apiData.length >0) {
             apiData = this.renderStringToObject(apiData);
             return (
                 <div>
@@ -331,6 +409,7 @@ export default class ReactGrids extends Component {
                             <ColorContext.Provider value={this.state.cellCss}>
                                 <ReactDataGrid
                                     onGridSort={this.handleGridSort}
+                                    onRowClick={(id, row, col) => this.onRowClick(id, row, col)}
                                     enableCellSelect={true}
                                     columns={apiData}
                                     rowGetter={this.rowGetter}
@@ -350,7 +429,16 @@ export default class ReactGrids extends Component {
                             </ColorContext.Provider>
                         </ColContext.Provider>
                     </RowContext.Provider>
-                    <ModalFormatter show={this.state.isModal} onHide={isClose} />
+
+                    {
+                        this.state.isHistoryModal &&
+                        <HistoryModal modal={this.state.historyData} show={this.state.isHistoryModal} onHide={isHistoryClose} />
+                    }
+                    {
+                        this.props.isGroupButton &&
+                        <GroupModal modal={this.state.groupData} show={this.state.isGroupModal} onHide={this.onGroupCloseRefresh} />
+                    }
+                   
                 </div>
             )
         }
@@ -361,11 +449,13 @@ export default class ReactGrids extends Component {
 
 ReactGrids.propTypes = {
     getApi: PropTypes.string,
-    postApi: PropTypes.string,
-    isBasic: PropTypes.bool,
     isDoubleHeader: PropTypes.bool,
-    isCsvButton: PropTypes.bool,
-    gridButton: PropTypes.element
+    isGroupButton: PropTypes.bool,
+    gridButton: PropTypes.element,
+    refreshGrid: PropTypes.bool,
+    parentOptions: PropTypes.array,
+    postApi: PropTypes.string,
+    identifier: PropTypes.func
 }
 
 class HeaderGroup extends Component {
@@ -395,6 +485,8 @@ class CellRenderer extends Component {
     };
 
     render() {
+        //let isIdentity = (this.props.column.control === "identity");
+       
         return (
             <RowContext.Consumer>
                 {row => (

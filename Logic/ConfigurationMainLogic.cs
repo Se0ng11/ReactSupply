@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ReactSupply.Bundles;
+using ReactSupply.Utils;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Transactions;
 
 namespace ReactSupply.Logic
 {
@@ -18,51 +20,61 @@ namespace ReactSupply.Logic
 
         }
 
-        public async Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
+        public async Task<Status.MessageType> PostDoubleKeyFieldAsync(string identifier, string identifier1, string updated, string user)
         {
-            ResponseMessage rm = new ResponseMessage();
-
             try
             {
+                var obj = JObject.Parse(updated);
+                var oName = "";
+                var oValue = "";
+
+                foreach (var property in obj.Properties())
+                {
+                    oName = property.Name;
+                    oValue = property.Value.ToString();
+                }
+
+
                 var entity = await _context.ConfigurationMain
-                                .FirstOrDefaultAsync(x => x.ValueName == indentifier)
+                                .FirstOrDefaultAsync(x => x.ValueName == identifier)
                                 .ConfigureAwait(false);
 
                 if (entity != null)
                 {
-                    var shadow = _context.Entry(entity).Property(valueName);
-                    if (data == "")
-                        data = null;
+                    var shadow = _context.Entry(entity).Property(oName);
+                    if (oValue == "")
+                        oValue = null;
 
                     if (shadow.CurrentValue != null)
                     {
                         if (shadow.CurrentValue.GetType().Name == "Boolean")
                         {
-                            shadow.CurrentValue = Convert.ToBoolean(data);
+                            shadow.CurrentValue = Convert.ToBoolean(oValue);
                         }
                         else if (shadow.CurrentValue.GetType().Name == "Decimal")
                         {
-                            shadow.CurrentValue = Convert.ToDecimal(data);
+                            shadow.CurrentValue = Convert.ToDecimal(oValue);
                         }
                         else if (shadow.CurrentValue.GetType().Name == "Integer")
                         {
-                            shadow.CurrentValue = Convert.ToInt32(data);
+                            shadow.CurrentValue = Convert.ToInt32(oValue);
                         }
                         else
                         {
-                            shadow.CurrentValue = data;
+                            shadow.CurrentValue = oValue;
                         }
                     }
                     else
                     {
-                        shadow.CurrentValue = data;
+                        shadow.CurrentValue = oValue;
                     }
 
                     _context.ConfigurationMain.Update(entity);
                     await _context.SaveChangesAsync().ConfigureAwait(false);
-                    rm.Status = "Success";
+                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user);
+                    return Status.MessageType.SUCCESS;
 
-                    
+
                 }
                 else
                 {
@@ -71,12 +83,10 @@ namespace ReactSupply.Logic
             }
             catch (Exception ex)
             {
-                rm.Status = "Failed";
-                rm.Result = ex.Message;
                 _Logger.Error(ex);
             }
 
-            return Tools.ConvertToJSON(rm);
+            return Status.MessageType.FAILED;
         }
 
         public async Task<string> SelectAllDataAsync()
@@ -85,18 +95,25 @@ namespace ReactSupply.Logic
 
             try
             {
-                lst = await _context.ConfigurationMain
-                        .OrderBy(x => x.Id)
-                        .AsNoTracking()
-                        .ToListAsync()
-                        .ConfigureAwait(false);
+                using (new TransactionScope(
+                     TransactionScopeOption.Required,
+                     new TransactionOptions
+                     {
+                         IsolationLevel = IsolationLevel.ReadUncommitted
+                     }))
+                {
+                    lst = await _context.ConfigurationMain
+                       .OrderBy(x => x.Id)
+                       .AsNoTracking()
+                       .ToListAsync()
+                       .ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {
                 _Logger.Error(ex);
-                throw ex;
-            }
 
+            }
             return Tools.ConvertToJSON(lst);
         }
 
@@ -108,19 +125,19 @@ namespace ReactSupply.Logic
             {
                 lst = await _context.ConfigurationMain
                     .Where(x => x.IsVisible == true)
-                    .OrderBy(x => x.Group)
-                    .ThenBy(x => x.Position)
+                    .OrderBy(x => x.Position)
                     .Select(x => new ReactDataFormatter
                     {
                         key = x.ValueName,
                         name = x.DisplayName,
-                        title = x.Group,
+                        Group = x.Group,
                         width = Convert.ToInt32(x.Width),
                         locked = x.IsLocked,
                         sortable = x.IsSortable,
                         editable = x.IsEditable,
                         filterable = x.IsFilterable,
                         resizable = x.IsResizeable,
+                        inlineField = x.IsInlineField,
                         headerClass = x.HeaderCss,
                         cellClass = x.BodyCss,
                         control = x.ControlType,

@@ -13,7 +13,9 @@ export class Auth extends React.Component {
             password: "",
             message: "",
             redirect: false,
-            disabled: false
+            disabled: false,
+            appId: "",
+            adLink:""
         }
         this.onChange = this.onChange.bind(this);
     }
@@ -21,37 +23,53 @@ export class Auth extends React.Component {
     componentDidMount() {
         if (localStorage.getItem("token") !== null) {
             this.setState({ redirect: true });
+        } else {
+            let self = this;
+
+            axios.get('api/Settings/GetAppInfo')
+                .then((response) => {
+                    let data = JSON.parse(response.data);
+                    self.setState({
+                        appId: data.appId.Value,
+                        adLink: data.adAuth.Value
+                    });
+
+            }).catch((error) => {
+                self.onError(error.message);
+            });
         }
     }
 
     onSubmit= (e) => {
         e.preventDefault();
         let self = this;
-        this.setState({ disabled: true });
+        self.setState({ disabled: true });
 
-        axios.post('http://ngc-devvm1:8086/api/login/login', {
-            AppId: "Rr0eExUJ0zlvXr02",
-            UserId: self.state.userId,
-            Password: self.state.password
-        }).then((response) => {
-            var data = response.data.Data;
-            if (data !== null) {
-                self.onADLogin(self, self.state.userId, data.Token);
-            } else {
-                self.setState({
-                    message: response.data.ResponseMessage,
-                    disabled: false
-                });
-            }
+        self.onADLogin(self, self.state.userId, "faketoken");
 
-        }).catch((error) => {
-            toast.error(error.message);
-        });
+        //axios.post(self.state.adLink, {
+        //    AppId: self.state.appId,
+        //    UserId: self.state.userId,
+        //    Password: self.state.password
+        //}).then((response) => {
+        //    var data = response.data.Data;
+        //    if (data !== null) {
+        //        self.onADLogin(self, self.state.userId, data.Token);
+        //    } else {
+        //        self.setState({
+        //            message: response.data.ResponseMessage,
+        //            disabled: false
+        //        });
+        //    }
+
+        //}).catch((error) => {
+        //    self.onError(error.message);
+        //});
     }
 
     onADLogin=(self, userId, adToken) => {
-         axios.post('api/Auth', {
-             UserId: userId
+        axios.post('api/Auth/LoginAsync', {
+             UserName: userId
         }).then((response) => {
             var data = JSON.parse(response.data);
 
@@ -72,10 +90,16 @@ export class Auth extends React.Component {
                 });
             }
         }).catch((error) => {
-            toast.error(error.message);
+            self.onError(error.message);
         });
     }
 
+    onError = (error) => {
+        this.setState({
+            disabled: false
+        });
+        toast.error(error);
+    }
     onChange= (e) => {
         this.setState({
             [e.target.name]: e.target.value,

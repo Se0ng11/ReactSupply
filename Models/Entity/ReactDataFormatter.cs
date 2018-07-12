@@ -11,6 +11,7 @@
         public bool editable { get; set; }
         public bool filterable { get; set; }
         public bool resizable { get; set; }
+        public bool inlineField { get; set; }
         public string cellClass { get; set; }
         public string headerClass { get; set; }
         public string formatter { get; set; }
@@ -18,6 +19,7 @@
         public string editor { get; set; }
         public string control { get; set; }
         public object filterRenderer { get; set; }
+        public string Group { get; set; }
 
     }
 }

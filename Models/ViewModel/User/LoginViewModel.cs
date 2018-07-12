@@ -11,7 +11,5 @@ namespace ReactSupply.Models.ViewModel.User
         {
 
         }
-
-        public string LoginUrl { get; set; }
     }
 }

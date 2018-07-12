@@ -35,19 +35,23 @@ body {
 }
 
 .fo-red {
-    color:red;
+    color: red !important;
 }
 
 .fo-blue {
-    color: blue;
+    color: blue !important;
 }
 
 .fo-green {
-    color: green;
+    color: green !important;
 }
 
 .fo-yellow {
-    color: yellow;
+    color: yellow !important;
+}
+
+.fo-white {
+    color: #fff !important;
 }
 
 .error {

@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ReactSupply.Bundles;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
 using ReactSupply.Models.ViewModel.User;
+using ReactSupply.Utils;
 using System;
 using System.Threading.Tasks;
 
@@ -19,49 +19,43 @@ namespace ReactSupply.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ResponseMessage _responseMessage = new ResponseMessage();
+        private readonly ILogger<AuthController> _logger;
         private readonly SettingLogic _setting;
 
         public AuthController(SupplyChainContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<HistoryController> logger)
+            ILogger<AuthController> logger)
             :base(context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _logger = logger;
 
             _setting = new SettingLogic(_context);
         }
 
-        [HttpPost]
+        [HttpPost("[action]")]
         [AllowAnonymous]
         public async Task<string> LoginAsync([FromBody]LoginViewModel model)
         {
             try
             {
-                bool isSuper = model.UserId == _setting.GetSuperId();
-                ApplicationUser user = await _userManager.FindByNameAsync(model.UserId);
+                bool isSuper = model.UserName == _setting.GetSuperId();
+                ApplicationUser user = await _userManager.FindByNameAsync(model.UserName);
+                string token = "";
 
-                if (user != null || isSuper)
+                if (user == null)
                 {
-                    var token = Tools.GenerateJwtToken(_setting, model.UserId, "", isSuper, out string outRefreshToken);
-
-                    if (user != null && !await _userManager.IsLockedOutAsync(user))
-                    { 
-                        await _userManager.SetAuthenticationTokenAsync(user, Messages.COMPANYNAME, Messages.REFRESHTOKEN, outRefreshToken);
-                   
-                    }
-
-                    _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
-                    _responseMessage.Result = token;
+                    token = Tools.GenerateJwtToken(_setting, model.UserName, "", "", isSuper, out string outRefreshToken);
+                    _responseMessage = await LoginResult(user, isSuper, token, outRefreshToken);
                 }
                 else
                 {
-                    _responseMessage.Status = Status.MessageType.FAILED.ToString();
-                    _responseMessage.Result = Messages.LOGININFO;
+                    var role = await _userManager.GetRolesAsync(user);
+                    token = Tools.GenerateJwtToken(_setting, model.UserName, role[0], "", isSuper, out string outRefreshToken);
+                    _responseMessage = await LoginResult(user, isSuper, token, outRefreshToken);
                 }
-
             }
             catch (Exception ex)
             {
@@ -70,6 +64,29 @@ namespace ReactSupply.Controllers
             }
           
             return Tools.ConvertToJSON(_responseMessage);
+        }
+
+        private async Task<ResponseMessage> LoginResult(ApplicationUser user, bool isSuper, string token, string refreshToken)
+        {
+            ResponseMessage obj = new ResponseMessage();
+            if (user != null && !await _userManager.IsLockedOutAsync(user))
+            {
+                await _userManager.SetAuthenticationTokenAsync(user, Messages.COMPANYNAME, Messages.REFRESHTOKEN, refreshToken);
+                obj.Status = Status.MessageType.SUCCESS.ToString();
+                obj.Result = token;
+            }
+            else if (isSuper)
+            {
+                obj.Status = Status.MessageType.SUCCESS.ToString();
+                obj.Result = token;
+            }
+            else
+            {
+                obj.Status = Status.MessageType.FAILED.ToString();
+                obj.Result = Messages.LOGININFO;
+            }
+
+            return obj;
         }
 
         [HttpPost("[action]")]

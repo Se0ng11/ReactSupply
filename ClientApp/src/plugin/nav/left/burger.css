@@ -21,7 +21,11 @@
 }
 
 .bm-menu {
-    background: #2c3e50;
+    background: rgb(53,106,160);
+    background: -moz-linear-gradient(45deg, rgba(53,106,160,1) 0%, rgba(53,106,160,1) 100%);
+    background: -webkit-linear-gradient(45deg, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%);
+    background: linear-gradient(45deg, rgba(53,106,160,1) 0%,rgba(53,106,160,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#356aa0', endColorstr='#356aa0',GradientType=1 );
     padding: 0 1em 0;
     font-size: 1.15em;
 }
@@ -73,6 +77,6 @@
     }
 
         .bm-menu a:hover {
-            color: green;
+            color: #000;
             background: none;
         }

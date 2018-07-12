@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
+using ReactSupply.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ReactSupply.Logic
 {
-    public class SettingLogic : BaseLogic, IConfig
+    public class SettingLogic : BaseLogic, IConfig, ISettings
     {
         private List<Setting> _settings = new List<Setting>();
 
@@ -17,12 +18,6 @@ namespace ReactSupply.Logic
         {
             _settings = SelectSetting();
         }
-
-        public Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<string> SelectAllDataAsync()
         {
             try
@@ -61,26 +56,12 @@ namespace ReactSupply.Logic
             return value.ToLower();
         }
 
-        public string GetAccessExpireInMinute()
+        public string GetSettingValueInString(string code)
         {
             string value = "";
             try
             {
-                value = _settings.Where(x => x.Code == "AccessExpire").Select(x => x.Value).SingleOrDefault();
-            }
-            catch(Exception ex)
-            {
-                _Logger.Error(ex);
-            }
-            return value;
-        }
-
-        public string GetRefreshExpireInMinute()
-        {
-            string value = "";
-            try
-            {
-                value = _settings.Where(x => x.Code == "RefreshExpire").Select(x => x.Value).SingleOrDefault();
+                value = _settings.Where(x => x.Code == code).Select(x => x.Value).SingleOrDefault();
             }
             catch (Exception ex)
             {
@@ -107,6 +88,25 @@ namespace ReactSupply.Logic
             return lst;
         }
 
-       
+        public Task<Status.MessageType> PostDoubleKeyFieldAsync(string indentifier, string identifier1, string updated, string user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Setting GetSettingValue(string code)
+        {
+            Setting obj = new Setting();
+            try
+            {
+                obj = _settings.Where(x => x.Code == code)
+                        .SingleOrDefault();
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error(ex);
+            }
+
+            return obj;
+        }
     }
 }

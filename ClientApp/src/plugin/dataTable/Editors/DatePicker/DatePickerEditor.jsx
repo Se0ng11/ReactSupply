@@ -1,9 +1,9 @@
-﻿import React from 'react';
+﻿import './DatePickerEditor.css';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
-import './DatePickerEditor.css';
 
 const { editors: { EditorBase } } = require('react-data-grid');
 

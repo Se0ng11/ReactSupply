@@ -2,7 +2,7 @@
 import { CSVLink } from 'react-csv';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-
+require("babel-polyfill");
 export class CsvButton extends Component {
 
     render() {

@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using ReactSupply.Bundles;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
+using ReactSupply.Utils;
 using System.Threading.Tasks;
 
 namespace ReactSupply.Controllers
@@ -16,16 +16,16 @@ namespace ReactSupply.Controllers
     public class TokenController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly ResponseMessage _responseMessage = new ResponseMessage();
         private readonly SettingLogic _setting;
-        public TokenController(SupplyChainContext context, UserManager<ApplicationUser> userManager, 
-            SignInManager<ApplicationUser> signInManager, 
-            ILogger<HistoryController> logger) 
+        private readonly ILogger<TokenController> _logger;
+
+        public TokenController(SupplyChainContext context, 
+            UserManager<ApplicationUser> userManager,
+            ILogger<TokenController> logger) 
             :base(context)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+            _logger = logger;
             _setting = new SettingLogic(_context);
         }
 
@@ -36,12 +36,12 @@ namespace ReactSupply.Controllers
             ApplicationUser user = await _userManager.FindByNameAsync(token.UserId);
 
             bool isSuper = token.UserId == _setting.GetSuperId();
-
+          
             if (isSuper)
             {
-                var newToken = Tools.GenerateJwtToken(_setting, token.UserId, token.Refresh, isSuper, out string outRefreshToken);
+                var newToken = Tools.GenerateJwtToken(_setting, token.UserId, token.Role, token.Refresh, isSuper, out string outRefreshToken);
 
-                _responseMessage.Status = Bundles.Status.MessageType.SUCCESS.ToString();
+                _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
                 _responseMessage.Result = newToken;
             }
             else
@@ -50,7 +50,7 @@ namespace ReactSupply.Controllers
 
                 if (token.Refresh == currentRefresh)
                 {
-                    var newToken = Tools.GenerateJwtToken(_setting, user.UserName, currentRefresh, isSuper, out string outRefreshToken);
+                    var newToken = Tools.GenerateJwtToken(_setting, user.UserName, token.Role, currentRefresh, isSuper, out string outRefreshToken);
 
                     _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
                     _responseMessage.Result = newToken;

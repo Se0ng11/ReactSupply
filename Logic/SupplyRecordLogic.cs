@@ -1,13 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using ReactSupply.Interface;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
 using System;
 using System.Threading.Tasks;
+using ReactSupply.Utils;
 
 namespace ReactSupply.Logic
 {
-    public class SupplyRecordLogic: BaseLogic, IConfig
+    public class SupplyRecordLogic: BaseLogic, IConfig, ISupplyRecord
     {
         public SupplyRecordLogic(SupplyChainContext context)
             :base(context)
@@ -29,50 +31,75 @@ namespace ReactSupply.Logic
             catch (Exception ex)
             {
                 _Logger.Error(ex);
-                throw ex;
             }
-
+            if (lst.JsonResult == null)
+            {
+                return "";
+            }
             return lst.JsonResult.Replace("\\\\", "");
-        }
-
-        public async Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
-        {
-            string StatusMessage = "Failed";
-
-            try
-            {
-                var entity = await _context.SupplyRecord
-                                .FirstOrDefaultAsync(x => x.ValueName == valueName && x.AxNumber == indentifier)
-                                .ConfigureAwait(false);
-
-                if (entity != null)
-                {
-                    entity.Data = data;
-                    entity.ModifiedDate = DateTime.Now;
-                    entity.ModifiedBy = "";
-
-                    _context.SupplyRecord.Update(entity);
-                    await _context.SaveChangesAsync().ConfigureAwait(false);
-                    StatusMessage = "Success";
-
-                }
-                else
-                {
-                    //do add here
-                }
-            }
-            catch (Exception ex)
-            {
-                _Logger.Error(ex);
-                throw ex;
-            }
-
-            return StatusMessage;
         }
 
         public string SelectSchemaHeaderSync()
         {
             throw new NotImplementedException();
+        }
+
+
+        public async Task<Status.MessageType> PostDoubleKeyFieldAsync(string identifier, string identifier1, string updated, string user)
+        {
+            var obj = JObject.Parse(updated);
+            var oName = "";
+            var oValue = "";
+
+            foreach (var property in obj.Properties())
+            {
+                oName = property.Name;
+                oValue = property.Value.ToString();
+
+                try
+                {
+                    var entity = await _context.SupplyRecord
+                                    .FirstOrDefaultAsync(x => x.ValueName == oName && x.AxNumber == identifier)
+                                    .ConfigureAwait(false);
+
+                    if (entity != null)
+                    {
+                        entity.Data = oValue;
+                        entity.ModifiedDate = DateTime.Now;
+                        entity.ModifiedBy = user;
+
+                        _context.SupplyRecord.Update(entity);
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        entity = new SupplyRecord
+                        {
+                            AxNumber = identifier,
+                            ValueName = oName,
+                            Data = oValue,
+                            Status = "Open",
+                            ModifiedDate = DateTime.Now,
+                            ModifiedBy = user,
+                            CreatedDate = DateTime.Now,
+                            CreatedBy = user
+                        };
+
+                        _context.SupplyRecord.Add(entity);
+                        await _context.SaveChangesAsync().ConfigureAwait(false);
+
+                    }
+                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user);
+                }
+                catch (Exception ex)
+                {
+                    _Logger.Error(ex);
+                    return Status.MessageType.FAILED;
+                }
+            }
+
+            return Status.MessageType.SUCCESS;
+
         }
     }
 }

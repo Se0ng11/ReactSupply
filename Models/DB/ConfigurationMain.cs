@@ -23,6 +23,7 @@ namespace ReactSupply.Models.DB
         public bool IsRequired { get; set; }
         public bool IsResizeable { get; set; }
         public bool IsSortable { get; set; }
+        public bool IsInlineField { get; set; }
         public string Formatter { get; set; }
         public string HeaderRenderer { get; set; }
         public string Editor { get; set; }
@@ -30,5 +31,6 @@ namespace ReactSupply.Models.DB
         public string Group { get; set; }
         public string HeaderCss { get; set; }
         public string BodyCss { get; set; }
+
     }
 }

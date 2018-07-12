@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using ReactSupply.Bundles;
+using ReactSupply.Utils;
 
 namespace ReactSupply.Logic
 {
@@ -15,11 +15,6 @@ namespace ReactSupply.Logic
             :base(context)
         {
 
-        }
-
-        public Task<string> PostSingleFieldAsync(string indentifier, string valueName, string data)
-        {
-            throw new System.NotImplementedException();
         }
 
         public async Task<string> SelectAllDataAsync()
@@ -71,6 +66,11 @@ namespace ReactSupply.Logic
                 throw ex;
             }
             return lst;
+        }
+
+        public Task<Status.MessageType> PostDoubleKeyFieldAsync(string indentifier, string identifier1, string updated, string user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

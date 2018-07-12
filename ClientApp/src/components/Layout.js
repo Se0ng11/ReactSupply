@@ -4,7 +4,7 @@ import { Top, Burger } from '../plugin/nav/NavList';
 import { Col, Grid, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Redirect } from 'react-router-dom';
-import IdleTimer from 'react-idle-timer';
+//import IdleTimer from 'react-idle-timer';
 
 export class Layout extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ export class Layout extends Component {
             top: [],
             left: [],
             redirect: false,
-            timeOut: 900000
+            //timeOut: 900000
         }
     }
 
@@ -50,27 +50,40 @@ export class Layout extends Component {
 
         return (
             <div>
-                <IdleTimer
-                    ref="idleTimer"
-                    element={document}
-                    activeAction={this._onActive}
-                    idleAction={this._onIdle}
-                    timeout={this.state.timeOut}>
-                        <Top menu={this.state.top} />
-                        {
-                            currentMenu.length > 0 &&
-                            <Burger {...this.props} menu={this.state.left} />
-                        }
+                <Top menu={this.state.top} />
+                {
+                    currentMenu.length > 0 &&
+                    <Burger {...this.props} menu={this.state.left} />
+                }
     
-                        <Grid fluid id="page-wrap">
-                            <Row>
-                                <Col sm={12}>
-                                    {React.cloneElement(this.props.children, { menu: currentMenu })}
-                                </Col>
-                            </Row>
-                        </Grid>
-                </IdleTimer>
+                <Grid fluid id="page-wrap">
+                    <Row>
+                        <Col sm={12}>
+                            {React.cloneElement(this.props.children, { menu: currentMenu })}
+                        </Col>
+                    </Row>
+                </Grid>
             </div>
         );
     }
 }
+//<IdleTimer
+//    ref="idleTimer"
+//    element={document}
+//    activeAction={this._onActive}
+//    idleAction={this._onIdle}
+//    timeout={this.state.timeOut}>
+//    <Top menu={this.state.top} />
+//    {
+//        currentMenu.length > 0 &&
+//        <Burger {...this.props} menu={this.state.left} />
+//    }
+
+//    <Grid fluid id="page-wrap">
+//        <Row>
+//            <Col sm={12}>
+//                {React.cloneElement(this.props.children, { menu: currentMenu })}
+//            </Col>
+//        </Row>
+//    </Grid>
+//</IdleTimer>

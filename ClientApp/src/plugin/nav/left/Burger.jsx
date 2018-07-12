@@ -1,6 +1,6 @@
 ﻿import '../left/burger.css';
 import React from 'react';
-import { push as Menu } from 'react-burger-menu';
+import { slide as Menu } from 'react-burger-menu';
 //import { LinkContainer } from 'react-router-bootstrap';
 //import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from "react-router-dom";

@@ -1,9 +1,11 @@
 ﻿import { BooleanFormatter } from './Boolean/BooleanFormatter';
-import { ModalFormatter } from './Modal/ModalFormatter';
+import { HistoryModal } from './Modal/HistoryModal';
+import { GroupModal } from './Modal/GroupModal';
 import { EmptyRowFormatter } from './EmptyRow/EmptyRowFormatter';
 
 export {
     BooleanFormatter,
-    ModalFormatter,
-    EmptyRowFormatter
+    EmptyRowFormatter,
+    HistoryModal,
+    GroupModal
 }

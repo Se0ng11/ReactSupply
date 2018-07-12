@@ -35,7 +35,7 @@ namespace ReactSupply
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connStr));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
@@ -57,10 +57,10 @@ namespace ReactSupply
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidAudience = Bundles.Messages.COMPANY_WEBADDRESS,
-                    ValidIssuer = Bundles.Messages.COMPANY_WEBADDRESS,
+                    ValidAudience = Utils.Messages.COMPANY_WEBADDRESS,
+                    ValidIssuer = Utils.Messages.COMPANY_WEBADDRESS,
                     ClockSkew = TimeSpan.FromMinutes(0),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Bundles.Messages.ACCESS_KEY))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Utils.Messages.ACCESS_KEY))
                 };
             });
 
