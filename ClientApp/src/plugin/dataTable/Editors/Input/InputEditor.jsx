@@ -4,9 +4,6 @@ import ReactDOM from 'react-dom';
 const { editors: { EditorBase } } = require('react-data-grid');
 
 export class InputEditor extends EditorBase {
-    constructor(props) {
-        super(props);
-    }
 
     getInputNode() {
         return ReactDOM.findDOMNode(this);

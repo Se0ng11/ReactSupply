@@ -1,41 +1,49 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using ReactSupply.Interface;
 using ReactSupply.Logic;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
 using ReactSupply.Utils;
+using System;
 using System.Threading.Tasks;
 
 namespace ReactSupply.Controllers
 {
-
     [Authorize]
     [Produces("application/json")]
     [Route("api/Home")]
     public class HomeController : BaseController
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SettingLogic _setting;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(SupplyChainContext context,
+            UserManager<ApplicationUser> userManager,
             ILogger<HomeController> logger)
             :base(context)
         {
             _logger = logger;
+            _userManager = userManager;
+            _setting = new SettingLogic(_context);
         }
 
         [HttpGet("[action]")]
-        public string GetSupplyRecord()
+        public async Task<string> GetSupplyRecord(RequestData modal)
         {
+
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var isGuest = (User.Identity.Name == _setting.GetSuperId()) ? true : await _userManager.IsInRoleAsync(user, "Guest");
+
             var obj = new ConfigurationMainLogic(_context);
             var obj1 = new SupplyRecordLogic(_context);
-            var data = obj.SelectHeader();
-            var data1 = obj1.SelectAllDataAsync();
+            var data = obj.SelectHeader(Convert.ToInt32(modal.identifier), isGuest);
+            var data1 = obj1.SelectMenuData(modal.identifier);
 
-            Task.WhenAll(data, data1);
+            await Task.WhenAll(data, data1);
 
             var result = new TableFormatter { Header = data.Result, Body = data1.Result };
             return Tools.ConvertToJSON(result);

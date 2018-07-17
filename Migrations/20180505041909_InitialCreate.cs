@@ -55,10 +55,11 @@ namespace ReactSupply.Migrations
                     ValueName = table.Column<string>(maxLength: 50, nullable: false),
                     AxNumber = table.Column<string>(maxLength: 20, nullable: false),
                     Data = table.Column<string>(maxLength: 1000, nullable: true),
-                    CreatedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
-                    CreatedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())"),
                     ModifiedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
-                    ModifiedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())")
+                    ModifiedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())"),
+                    CreatedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
+                    CreatedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())")
+                  
                 },
                 constraints: table =>
                 {

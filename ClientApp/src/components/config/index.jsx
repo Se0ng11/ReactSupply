@@ -2,10 +2,6 @@
 import { Users, Fields } from './child';
 
 export class Config extends Component {
-    constructor(props) {
-        super(props);
-    }
-
 
     //componentWillReceiveProps(nextProps) {
     //    let something = nextProps;
@@ -18,22 +14,22 @@ export class Config extends Component {
         //4002
         //4003
         //4004
-        if (page === "4001") {
+        if (page === "6001") {
             return (
                 <Users />    
             )
-        } else if (page === "4003") {
+        } else if (page === "6002") {
             return (
                 <Fields />
             );
-        } else if (page === "4001") {
+        } else if (page === "4003") {
 
         } else if (page === "4004") {
 
         }
 
         return (
-            <h2>This is config page</h2>
+            <h2>This is Config Page</h2>
         );
        
     }

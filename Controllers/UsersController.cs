@@ -70,7 +70,7 @@ namespace ReactSupply.Controllers
                     await _userManager.AddToRoleAsync(user, modal.Role);
                     _responseMessage.Status = Status.MessageType.SUCCESS.ToString();
                     _responseMessage.Result = Messages.SAVESUCCESS;
-                    await _history.LogHistory(user.UserName, "New ID", user.UserName, User.Identity.Name);
+                    await _history.LogHistory(user.UserName, "New ID", user.UserName, User.Identity.Name, Status.Method.Create);
                 }
                 else
                 {
@@ -162,7 +162,7 @@ namespace ReactSupply.Controllers
                     var roles = _userManager.GetRolesAsync(user);
                     await _userManager.RemoveFromRolesAsync(user, roles.Result.ToArray());
                     await _userManager.AddToRoleAsync(user, oValue);
-                    await _history.LogHistory(user.UserName, oName, oValue, User.Identity.Name);
+                    await _history.LogHistory(user.UserName, oName, oValue, User.Identity.Name, Status.Method.Update);
                 }
                 else
                 {
@@ -175,7 +175,7 @@ namespace ReactSupply.Controllers
                         await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
                     }
 
-                    await _history.LogHistory(user.UserName, "Locked", oValue, User.Identity.Name);
+                    await _history.LogHistory(user.UserName, "Locked", oValue, User.Identity.Name, Status.Method.Update);
                 }
 
                 _responseMessage.Status = Status.MessageType.SUCCESS.ToString();

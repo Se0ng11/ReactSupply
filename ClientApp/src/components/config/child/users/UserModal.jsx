@@ -43,7 +43,7 @@ export class UserModal extends React.Component {
 
     handleSubmit = () => {
         const self = this;
-        axios.post("/api/Users/Register",
+        axios.post("api/Users/Register",
             {
                 UserName: self.state.userId,
                 Email: self.state.email,
@@ -80,7 +80,7 @@ export class UserModal extends React.Component {
     }
 
     handleEntered = () => {
-        axios.get("/api/Roles/GetRoles").then((response) => {
+        axios.get("api/Roles/GetRoles").then((response) => {
             let data = JSON.parse(response.data);
 
             if (data.Status === "SUCCESS") {

@@ -159,7 +159,6 @@ export class GroupModal extends React.Component {
 
     handleChange = (e) => {
         let self = this;
-        let obj = {}
         let name = e.target.name;
         let value = e.target.value;
 
@@ -243,8 +242,13 @@ export class GroupModal extends React.Component {
 
     handleHide = () => {
         let self = this;
+        self.setState(prevState=>({
+            ui: {
+                ...prevState.ui,
+                message: ""
+            }
+        }));
         self.props.onHide(self.state.ui.refresh);
-        self.setState(null);
     }
 
     render() {

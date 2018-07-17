@@ -11,9 +11,10 @@ using System;
 namespace ReactSupply.Migrations
 {
     [DbContext(typeof(SupplyChainContext))]
-    partial class SupplyChainContextModelSnapshot : ModelSnapshot
+    [Migration("20180713010336_Tracker")]
+    partial class Tracker
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -127,45 +128,6 @@ namespace ReactSupply.Migrations
                     b.HasKey("Id", "ModuleId", "Identifier");
 
                     b.ToTable("History");
-                });
-
-            modelBuilder.Entity("ReactSupply.Models.DB.MainProduct", b =>
-                {
-                    b.Property<string>("Identifier")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("CreatedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("(suser_name())")
-                        .HasMaxLength(30);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsRecount");
-
-                    b.Property<string>("ModifiedBy")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("(suser_name())")
-                        .HasMaxLength(30);
-
-                    b.Property<DateTime>("ModifiedDate")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("Parent");
-
-                    b.Property<int>("Quantity");
-
-                    b.Property<string>("Size");
-
-                    b.HasKey("Identifier");
-
-                    b.ToTable("MainProduct");
                 });
 
             modelBuilder.Entity("ReactSupply.Models.DB.Menu", b =>

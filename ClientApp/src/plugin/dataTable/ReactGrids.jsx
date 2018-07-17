@@ -5,7 +5,8 @@ import axios from 'axios';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
 import { DatePickerEditor } from './Editors';
-import { BooleanFormatter, EmptyRowFormatter, HistoryModal, GroupModal } from './Formatter';
+import { BooleanFormatter, DateFormatter, EmptyRowFormatter, HistoryModal, GroupModal } from './Formatter';
+import Loader from '../loader/Loader';
 import { CsvButton } from './Button';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -44,6 +45,7 @@ export default class ReactGrids extends Component {
             isHistoryModal: false,
             isGroupModal: false,
             isGroupClicked: false,
+            isLoading: true,
             historyData: {
                 header: [],
                 body:[]
@@ -107,7 +109,27 @@ export default class ReactGrids extends Component {
                 self.postToServer(id1, id2, JSON.stringify(updated));
             }
         }
-        self.setState({ rows });
+
+        let allRows = self.state.rows;
+
+        for (var i = 0; i <= allRows.length - 1; i++) {
+            let s = allRows[i];
+            let updated = rows[0];
+
+            let old1 = self.props.identifier(s, 1);
+            let new1 = self.props.identifier(updated, 1);
+
+            let old2 = self.props.identifier(s, 2);
+            let new2 = self.props.identifier(updated, 2);
+
+
+            if (old1 === new1 && old2 === new2)
+            {
+                allRows[i] = updated;
+                break;
+            }
+        }
+        self.setState({ allRows });
     };
 
     postToServer = (id1, id2, updatedVal) => {
@@ -230,26 +252,33 @@ export default class ReactGrids extends Component {
             //if (ary.Group === undefined)
             //    ary.Group = "";
 
-            ary.headerRenderer = <HeaderGroup parent={ary.Group} child={ary.name} isDoubleHeader={this.props.isDoubleHeader} />;
+            ary.headerRenderer = <HeaderGroup parent={ary.Group} child={ary.name} />;
         }
 
         return ary.headerRenderer;
     }
 
     renderStringToFormatter = (ary) => {
-        if (ary.control.toLowerCase() === "boolean")
-        {
+        if (ary.control.toLowerCase() === "boolean") {
             ary.formatter = <BooleanFormatter />;
         }
+        else if (ary.formatter === "Date") {
+            ary.getRowMetaData = (row) => row;
+            ary.formatter = <DateFormatter />;
+        }
+        
 
         return ary.formatter;
     }
 
     onLoad = () => {
-        const self = this;
-
-        axios.get(this.props.getApi,
+        let self = this;
+        self.setState({isLoading: true});
+        axios.get(self.props.getApi,
             {
+                params: {
+                    identifier: localStorage.getItem("currentMenu")
+                },
                 cancelToken: new CancelToken(function executor(c) {
                     cancel = c;
                 })
@@ -265,11 +294,15 @@ export default class ReactGrids extends Component {
                         _rows[i].No = i + 1;
                     }
                 }
-                self.setState({ header: _header, rows: _rows });
+                self.setState({
+                    header: _header,
+                    rows: _rows,
+                    isLoading: false
+                });
 
             })
             .catch((error) => {
-
+                self.setState({ isLoading: false });
                 if (error.response !== undefined) {
                     let msg = error.message + ": " + error.response.statusText;
                     toast.error(msg);
@@ -279,8 +312,9 @@ export default class ReactGrids extends Component {
     }
 
     onDoubleClick = (rowIdx, row, column) => {
-        if (column.control === "identity") {
-            const self = this;
+        const self = this;
+        if (column.control === "identity" && self.props.isHistoryEnabled) {
+
             let identifier = self.props.identifier(row, 1);
 
             axios.get("api/History/GetHistory",
@@ -354,7 +388,8 @@ export default class ReactGrids extends Component {
         let self = this;
 
         self.setState({
-            isGroupModal: false
+            isGroupModal: false,
+            isGroupClicked: false
         });
 
         if (refresh) {
@@ -373,7 +408,7 @@ export default class ReactGrids extends Component {
             for (var i = 0; i <= header.length - 1; i++) {
                 let singleHeader = header[i];
 
-                if (singleHeader.Group === role) {
+                if (singleHeader.Group === role && singleHeader.inlineField) {
                     isMatch = true;
                     singleHeader.headerClass = (singleHeader.headerClass === undefined ? "steelblue" : singleHeader.headerClass);
                     roleColor = "grid-btn-left btn fo-white " + singleHeader.headerClass;
@@ -399,9 +434,11 @@ export default class ReactGrids extends Component {
     render() {
         let apiData = this.state.header;
         let isHistoryClose = () => this.setState({ isHistoryModal: false });
+        let headerHeight = this.props.headerRowHeight;
 
         if (apiData !== undefined && apiData.length >0) {
             apiData = this.renderStringToObject(apiData);
+
             return (
                 <div>
                     <RowContext.Provider value={this.state.cellRow}>
@@ -414,7 +451,7 @@ export default class ReactGrids extends Component {
                                     columns={apiData}
                                     rowGetter={this.rowGetter}
                                     rowsCount={this.getSize()}
-                                    headerRowHeight={this.props.isDoubleHeader?100:0}
+                                    headerRowHeight={headerHeight}
                                     minHeight={this.state.height}
                                     cellNavigationMode="changeRow"
                                     onGridRowsUpdated={this.handleGridRowsUpdated}
@@ -429,7 +466,7 @@ export default class ReactGrids extends Component {
                             </ColorContext.Provider>
                         </ColContext.Provider>
                     </RowContext.Provider>
-
+                    <Loader show={this.state.isLoading} />
                     {
                         this.state.isHistoryModal &&
                         <HistoryModal modal={this.state.historyData} show={this.state.isHistoryModal} onHide={isHistoryClose} />
@@ -443,14 +480,20 @@ export default class ReactGrids extends Component {
             )
         }
 
-        return (<div>Loading....</div>);
+        return (
+            <div>
+                <Loader show={this.state.isLoading} />
+            </div>
+
+        );
     }
 }
 
 ReactGrids.propTypes = {
+    headerRowHeight: PropTypes.number,
     getApi: PropTypes.string,
-    isDoubleHeader: PropTypes.bool,
     isGroupButton: PropTypes.bool,
+    isHistoryEnabled: PropTypes.bool,
     gridButton: PropTypes.element,
     refreshGrid: PropTypes.bool,
     parentOptions: PropTypes.array,
@@ -460,21 +503,12 @@ ReactGrids.propTypes = {
 
 class HeaderGroup extends Component {
     render() {
-        if ((this.props.parent !== undefined) && this.props.isDoubleHeader) {
-            return (
-                <div>
-                    <div>{this.props.parent}</div>
-                    <hr />
-                    <div>{this.props.child}</div>
-                </div>
-            )
-        } else {
-            return (
-                <div>
-                    <div>{this.props.child}</div>
-                </div>
-            )
-        }
+        return (
+            <div>
+                <p>{this.props.parent}</p>
+                <p>{this.props.child}</p>
+            </div>
+        )
     }
 }
 
@@ -486,6 +520,23 @@ class CellRenderer extends Component {
 
     render() {
         //let isIdentity = (this.props.column.control === "identity");
+        let self = this;
+
+        if (self.props.column.control === "date") {
+            let currentDate = self.props.value;
+            let targetDate = self.props.rowData[self.props.column.formatter];
+
+            if (self.props.column.formatter !== undefined && (currentDate !== undefined && targetDate !== undefined)) {
+                let mCurrent = moment(currentDate);
+                let mTarget = moment(targetDate);
+
+                if (mCurrent > mTarget) {
+                    return (
+                        <Cell {...self.props} ref={node => self.row = node} className="due-date" />
+                    );
+                }
+            }
+        }
        
         return (
             <RowContext.Consumer>
@@ -494,7 +545,7 @@ class CellRenderer extends Component {
                         {col => (
                             <ColorContext.Consumer>
                                 {color => (
-                                    <Cell {...this.props} ref={node => this.row = node} className={(row === JSON.stringify(this.props.rowData) && col === this.props.column.key) ? color : ''} />
+                                    <Cell {...self.props} ref={node => self.row = node} className={(row === JSON.stringify(self.props.rowData) && col === self.props.column.key) ? color : ''} />
                                 )}
                             </ColorContext.Consumer>
                         )}

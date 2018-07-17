@@ -19,9 +19,9 @@ namespace ReactSupply.Logic
 
         }
 
-        public async Task<string> LogHistory(string identifier, string field, string data, string user)
+        public async Task<string> LogHistory(string identifier, string field, string data, string user, Status.Method method)
         {
-            string message = "Update field {0} to {1}";
+            string message = GenerateMessage(method);
 
             try
             {
@@ -58,7 +58,7 @@ namespace ReactSupply.Logic
                     oValue = property.Value.ToString();
                 }
 
-                await LogHistory(identifier1, oName, oValue, user);
+                await LogHistory(identifier1, oName, oValue, user, Status.Method.Update);
                 return Status.MessageType.SUCCESS;
             }
             catch (Exception ex)
@@ -152,6 +152,30 @@ namespace ReactSupply.Logic
             }
 
             return Tools.ConvertToJSON(lst);
+        }
+
+        private string GenerateMessage(Status.Method method)
+        {
+            string message = "";
+
+            if (method == Status.Method.Create)
+            {
+                message = "Create new record of {0} from UI";
+            }
+            else if (method == Status.Method.Read)
+            {
+                message = "Read record {0} to {1}";
+            }
+            else if (method == Status.Method.Update)
+            {
+                message = "Update field {0} to {1}";
+            }
+            else if (method == Status.Method.Delete)
+            {
+                message = "Delete record {0}";
+            }
+
+            return message;
         }
     }
 }

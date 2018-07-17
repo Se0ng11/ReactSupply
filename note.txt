@@ -7,12 +7,16 @@ Scaffold-DbContext "Server=NGC-NBK-0141;Database=SupplyChain;Trusted_Connection=
 Add-Migration InitialCreate
 Remove-Migration
 
+Add-Migration Tracker -context SupplyChainContext
+
 #update the new change to database
 Update-Database
 
 update-database -context SupplyChainContext
 update-database -context ApplicationDbContext
 
+rollback migration
+Update-Database -Migration tracker -context SupplyChainContext
 
 #react boilerplate
 import React from 'react';

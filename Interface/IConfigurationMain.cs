@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ReactSupply.Interface
 {
-    public interface ISupplyRecord
+    interface IConfigurationMain
     {
-        Task<string> SelectMenuData(string menu);
+        Task<string> SelectHeader(int menu, bool isGuest);
     }
 }

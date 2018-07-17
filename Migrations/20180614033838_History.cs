@@ -18,9 +18,10 @@ namespace ReactSupply.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ModuleId = table.Column<int>(nullable: false),
                     Identifier = table.Column<string>(nullable: false),
+                    Message = table.Column<string>(nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
-                    CreatedDate = table.Column<DateTime>(nullable: false),
-                    Message = table.Column<string>(nullable: true)
+                    CreatedDate = table.Column<DateTime>(nullable: false)
+
                 },
                 constraints: table =>
                 {

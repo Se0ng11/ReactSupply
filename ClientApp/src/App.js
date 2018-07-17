@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import { Auth, Home, Sample, Config, NotFound, Report } from './components/MenuList';
+import { Auth, Home, Summary, Details, Config, NotFound, Report } from './components/MenuList';
 import { ToastContainer } from 'react-toastify';
 import ErrorBoundary from './plugin/error/ErrorBoundary';
 //import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -39,8 +39,9 @@ export default class App extends Component {
                     <Switch location={this.props.location}>
                         <Route exact path='/' component={Auth} />
                         <MainRoute exact path='/home' component={Home} />
-                        <MainRoute exact path='/data' component={Sample} />
-                        <MainRoute exact path='/data/:id' component={Sample} />
+                        <MainRoute exact path='/summary' component={Summary} />
+                        <MainRoute exact path='/data' component={Details} />
+                        <MainRoute exact path='/shipping' component={Details} />
                         <MainRoute exact path='/report' component={Report} />
                         <MainRoute exact path='/report/:id' component={Report} />
                         <MainRoute exact path='/config' component={Config} />

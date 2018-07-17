@@ -39,6 +39,31 @@ namespace ReactSupply.Logic
             return lst.JsonResult.Replace("\\\\", "");
         }
 
+        public async Task<string> SelectMenuData(string menu)
+        {
+            ResultJson lst = new ResultJson();
+
+            try
+            {
+                lst = await _context.JSONResult
+                        .FromSql("EXECUTE GET_Supply_Record @menu={0}", Convert.ToInt32(menu))
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync()
+                        .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error(ex);
+            }
+            if (lst.JsonResult == null)
+            {
+                return "";
+            }
+            return lst.JsonResult.Replace("\\\\", "");
+        }
+
+
+
         public string SelectSchemaHeaderSync()
         {
             throw new NotImplementedException();
@@ -89,7 +114,7 @@ namespace ReactSupply.Logic
                         await _context.SaveChangesAsync().ConfigureAwait(false);
 
                     }
-                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user);
+                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user, Status.Method.Update);
                 }
                 catch (Exception ex)
                 {

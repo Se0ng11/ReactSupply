@@ -20,7 +20,7 @@ export class RoleModal extends React.Component {
 
     handleSubmit = () => {
         const self = this;
-        axios.post("/api/Roles/Register",
+        axios.post("api/Roles/Register",
             {
                 Name: self.state.name
             }

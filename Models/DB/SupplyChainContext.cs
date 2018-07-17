@@ -12,6 +12,8 @@ namespace ReactSupply.Models.DB
         public virtual DbSet<SubMenu> SubMenu { get; set; }
         public virtual DbSet<History> History { get; set; }
         public virtual DbSet<Setting> Setting { get; set; }
+        public virtual DbSet<Tracker> Tracker { get; set; }
+        public virtual DbSet<MainProduct> MainProduct { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -151,6 +153,29 @@ namespace ReactSupply.Models.DB
             {
                 entity.HasKey(e => new { e.Code });
                 entity.Property(e => e.Code).HasMaxLength(20);
+            });
+
+            modelBuilder.Entity<Tracker>(entity =>
+            {
+                entity.HasKey(e => new { e.TargetField, e.AffectField });
+            });
+
+
+            modelBuilder.Entity<MainProduct>(entity =>
+            {
+                entity.HasKey(e => new { e.Identifier });
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
+                entity.Property(e => e.ModifiedBy)
+               .HasMaxLength(30)
+               .HasDefaultValueSql("(suser_name())");
+
+                entity.Property(e => e.ModifiedDate).HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.CreatedBy)
+               .HasMaxLength(30)
+               .HasDefaultValueSql("(suser_name())");
+
+                entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
             });
         }
     }

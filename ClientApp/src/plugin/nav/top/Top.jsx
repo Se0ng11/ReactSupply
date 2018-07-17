@@ -21,7 +21,7 @@ export default class Top extends React.Component {
 
     onSignOut = () => {
         const self = this;
-        axios.post("/api/Auth/Logout",
+        axios.post("api/Auth/Logout",
             {
                 UserId: localStorage.getItem("user"),
                 Refresh: localStorage.getItem("refresh")
@@ -31,7 +31,7 @@ export default class Top extends React.Component {
             self.setState({ redirect: true });
         })
         .catch((error) => {
-            let msg = "Layout() " + error.message + ": " + error.response.statusText;
+            let msg = error.message + ": " + error.response.statusText;
             toast.error(msg);
         });
     }

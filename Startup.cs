@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 //using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -30,7 +31,8 @@ namespace ReactSupply
             var connStr = Configuration.GetConnectionString("DefaultDatabase");
 
             services.AddDbContext<SupplyChainContext>(options =>
-             options.UseSqlServer(connStr));
+                options.UseSqlServer(connStr)
+            );
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connStr));

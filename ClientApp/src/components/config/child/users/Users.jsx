@@ -22,7 +22,7 @@ export class Users extends React.Component {
     }
 
     onLoad = () => {
-        axios.get("/api/Roles/GetRoles").then((response) => {
+        axios.get("api/Roles/GetRoles").then((response) => {
             let data = JSON.parse(response.data);
 
             if (data.Status === "SUCCESS") {
@@ -66,9 +66,10 @@ export class Users extends React.Component {
             return (
                 <div>
                     <ReactGrids
+                        headerRowHeight={50}
                         getApi="api/Users/GetUsers"
                         postApi="api/Users/PostRoles"
-                        isDoubleHeader={false}
+                        isHistoryEnabled={true}
                         refreshGrid={this.state.refreshGrid}
                         parentOptions={this.state.roleOptions}
                         identifier={this.getIdentifier}

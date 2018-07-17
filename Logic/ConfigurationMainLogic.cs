@@ -8,11 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using System.Transactions;
+//using System.Transactions;
 
 namespace ReactSupply.Logic
 {
-    public class ConfigurationMainLogic : BaseLogic, IConfig 
+    public class ConfigurationMainLogic : BaseLogic, IConfig, IConfigurationMain
     {
         public ConfigurationMainLogic(SupplyChainContext context)
             :base(context)
@@ -33,10 +33,10 @@ namespace ReactSupply.Logic
                     oName = property.Name;
                     oValue = property.Value.ToString();
                 }
-
+                var moduleId = Convert.ToInt32(identifier);
 
                 var entity = await _context.ConfigurationMain
-                                .FirstOrDefaultAsync(x => x.ValueName == identifier)
+                                .FirstOrDefaultAsync(x => x.ModuleId == moduleId && x.ValueName == identifier1)
                                 .ConfigureAwait(false);
 
                 if (entity != null)
@@ -71,7 +71,7 @@ namespace ReactSupply.Logic
 
                     _context.ConfigurationMain.Update(entity);
                     await _context.SaveChangesAsync().ConfigureAwait(false);
-                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user);
+                    await new HistoryLogic(_context).LogHistory(identifier, oName, oValue, user, Status.Method.Update);
                     return Status.MessageType.SUCCESS;
 
 
@@ -95,19 +95,21 @@ namespace ReactSupply.Logic
 
             try
             {
-                using (new TransactionScope(
-                     TransactionScopeOption.Required,
-                     new TransactionOptions
-                     {
-                         IsolationLevel = IsolationLevel.ReadUncommitted
-                     }))
-                {
+                //using (var scope = new TransactionScope(
+                //     TransactionScopeOption.Required,
+                //     new TransactionOptions
+                //     {
+                //         IsolationLevel = IsolationLevel.ReadUncommitted
+                //     }))
+                //{
                     lst = await _context.ConfigurationMain
                        .OrderBy(x => x.Id)
                        .AsNoTracking()
                        .ToListAsync()
                        .ConfigureAwait(false);
-                }
+
+                //    scope.Complete();
+                //}
             }
             catch (Exception ex)
             {
@@ -117,14 +119,13 @@ namespace ReactSupply.Logic
             return Tools.ConvertToJSON(lst);
         }
 
-        public async Task<string> SelectHeader()
+        public async Task<string> SelectHeader(int menu, bool isGuest)
         {
             List<ReactDataFormatter> lst = new List<ReactDataFormatter>();
-
             try
             {
                 lst = await _context.ConfigurationMain
-                    .Where(x => x.IsVisible == true)
+                    .Where(x => x.IsVisible == true && x.ModuleId == menu)
                     .OrderBy(x => x.Position)
                     .Select(x => new ReactDataFormatter
                     {
@@ -134,7 +135,7 @@ namespace ReactSupply.Logic
                         width = Convert.ToInt32(x.Width),
                         locked = x.IsLocked,
                         sortable = x.IsSortable,
-                        editable = x.IsEditable,
+                        editable = (isGuest)? false: x.IsEditable,
                         filterable = x.IsFilterable,
                         resizable = x.IsResizeable,
                         inlineField = x.IsInlineField,
@@ -171,17 +172,20 @@ namespace ReactSupply.Logic
             {
 
                 var entityType = typeof(ConfigurationMain).GetProperties();
-            
+
+                var smallWidth = new string[] { "ModuleId", "Position", "MinLength",
+                    "MaxLength", "Width", "IsLocked", "IsFilterable", "IsEditable", "IsVisible",
+                    "IsRequired", "IsResizeable", "IsSortable", "IsInlineField", "ControlType" };
                 lst = entityType
-                        .Where(x=> x.Name != "Id" && x.Name !="ModuleId")
+                        .Where(x=> x.Name != "Id")
                         .Select(x => new ReactDataFormatter
                         {
                             key = x.Name,
                             name = x.Name,
-                            width = 200,
-                            locked = (x.Name == "ValueName" ? true: false),
+                            width = (smallWidth.Contains(x.Name) ? 100 : 200),
+                            locked = (x.Name == "ValueName" || x.Name == "ModuleId" ? true: false),
                             sortable = true,
-                            editable = (x.Name == "ValueName" ? false : true),
+                            editable = (x.Name == "ValueName" || x.Name == "ModuleId" ? false : true),
                             filterable = true,
                             resizable = true,
                             control = (x.Name =="ControlType" ? "DropDown" : x.PropertyType.Name)
