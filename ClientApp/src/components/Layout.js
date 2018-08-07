@@ -26,8 +26,13 @@ export class Layout extends Component {
                 self.setState({ top: JSON.parse(data.top), left: JSON.parse(data.left) });
         })
         .catch((error) => {
-            let msg = "Layout() " + error.message + ": " + error.response.statusText;
-            toast.error(msg);
+
+            if (error.response !== undefined) {
+                let msg = error.message + ": " + error.response.statusText;
+                toast.error(msg);
+            } else {
+                toast.error(error.message);
+            }
         });
     }
 

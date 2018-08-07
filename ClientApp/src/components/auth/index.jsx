@@ -117,9 +117,9 @@ export class Auth extends React.Component {
         return (
             <div>
                 <form className="form-signin" onSubmit={this.onSubmit}>
-                    <h2 className="form-signin-heading">Sample</h2>
+                    <h2 className="form-signin-heading">Supply Chain Tracker</h2>
                     <label className="sr-only">Email address</label>
-                    <input type="input" name="userId" className="form-control" placeholder="Sample ID" onChange={this.onChange} disabled={this.state.disabled} />
+                    <input type="input" name="userId" className="form-control" placeholder="ID" onChange={this.onChange} disabled={this.state.disabled} />
                     <label className="sr-only">Password</label>
                     <input type="password" name="password" className="form-control" placeholder="Password" onChange={this.onChange} disabled={this.state.disabled} />
                     <button type="submit" className="btn btn-lg btn-primary btn-block" disabled={this.state.disabled}>Sign In <i className="fa fa-sign-in"></i></button>

@@ -119,9 +119,8 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
-                    b.Property<string>("AxNumber")
-                        .IsRequired()
-                        .HasMaxLength(20);
+                    b.Property<string>("Identifier")
+                        .IsRequired();
 
                     b.Property<string>("CreatedBy")
                         .ValueGeneratedOnAdd()

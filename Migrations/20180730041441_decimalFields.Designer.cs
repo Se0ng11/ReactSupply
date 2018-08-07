@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReactSupply.Models.DB;
 
 namespace ReactSupply.Migrations
 {
     [DbContext(typeof(SupplyChainContext))]
-    partial class SupplyChainContextModelSnapshot : ModelSnapshot
+    [Migration("20180730041441_decimalFields")]
+    partial class decimalFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -213,17 +215,6 @@ namespace ReactSupply.Migrations
                     b.ToTable("Menu");
                 });
 
-            modelBuilder.Entity("ReactSupply.Models.DB.RolesMenu", b =>
-                {
-                    b.Property<string>("RolesId");
-
-                    b.Property<string>("MenuId");
-
-                    b.HasKey("RolesId", "MenuId");
-
-                    b.ToTable("RolesMenu");
-                });
-
             modelBuilder.Entity("ReactSupply.Models.DB.Setting", b =>
                 {
                     b.Property<string>("Code")
@@ -282,6 +273,10 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(20);
+
                     b.Property<string>("CreatedBy")
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("(suser_name())")
@@ -293,9 +288,6 @@ namespace ReactSupply.Migrations
 
                     b.Property<string>("Data")
                         .HasMaxLength(1000);
-
-                    b.Property<string>("Identifier")
-                        .IsRequired();
 
                     b.Property<string>("ModifiedBy")
                         .ValueGeneratedOnAdd()
@@ -313,8 +305,7 @@ namespace ReactSupply.Migrations
 
             modelBuilder.Entity("ReactSupply.Models.DB.Tracker", b =>
                 {
-                    b.Property<string>("AffectField")
-                        .ValueGeneratedOnAdd();
+                    b.Property<string>("AffectField");
 
                     b.Property<int>("TotalDay");
 

@@ -19,19 +19,41 @@ namespace ReactSupply.Logic
 
         public async Task<string> SelectAllDataAsync()
         {
-            await Task.Run(()=> SelectAsList());
+            string role = "";
+            await Task.Run(() => SelectAsList(role));
 
-            return Tools.ConvertToJSON(SelectAsList().Result);
+            return Tools.ConvertToJSON(SelectAsList(role).Result);
         }
 
-        public string SelectVisibleData()
+        public async Task<string> SelectVisibleData()
         {
             IEnumerable<Menu> lst = null;
             try
             {
-                lst = SelectAsList().Result
+                lst = await _context.Menu
+                        .AsNoTracking()
                         .Where(x => x.IsEnabled == true)
-                        .OrderBy(x=> x.Position);
+                        .OrderBy(x => x.Position)
+                        .ToListAsync()
+                        .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _Logger.Error(ex);
+                throw ex;
+            }
+
+            return Tools.ConvertToJSON(lst);
+        }
+
+
+        public string SelectVisibleData(string role)
+        {
+            IEnumerable<Menu> lst = null;
+            try
+            {
+                lst = SelectAsList(role).Result
+                        .Where(x => x.IsEnabled == true);
               
             }
             catch (Exception ex)
@@ -48,15 +70,23 @@ namespace ReactSupply.Logic
             throw new System.NotImplementedException();
         }
 
-        public async Task<List<Menu>> SelectAsList()
+        public async Task<List<Menu>> SelectAsList(string role)
         {
             List<Menu> lst = new List<Menu>();
 
             try
             {
                 lst = await _context.Menu
-                        .OrderBy(x=> x.Position)
+                        .Join(_context.RolesMenu, 
+                            menu => menu.MenuCode,
+                            rMenu => rMenu.MenuId,
+                            (menu, rMenu) => new { menu, rMenu })
                         .AsNoTracking()
+                        .Where(x=>
+                            x.rMenu.RolesId == role
+                        )
+                        .OrderBy(x=> x.menu.Position)
+                        .Select(x=> x.menu)
                         .ToListAsync()
                         .ConfigureAwait(false);
             }

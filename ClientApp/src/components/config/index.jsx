@@ -9,11 +9,7 @@ export class Config extends Component {
 
     render() {
         let page = this.props.match.params.id;
-        //4001 ,lu
 
-        //4002
-        //4003
-        //4004
         if (page === "6001") {
             return (
                 <Users />    

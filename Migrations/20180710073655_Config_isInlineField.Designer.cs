@@ -210,7 +210,7 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
-                    b.Property<string>("AxNumber")
+                    b.Property<string>("Identifier")
                         .IsRequired()
                         .HasMaxLength(20);
 

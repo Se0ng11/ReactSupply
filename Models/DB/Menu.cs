@@ -14,6 +14,6 @@ namespace ReactSupply.Models.DB
         public string Url { get; set; }
         public bool IsEnabled { get; set; }
         
-        public List<SubMenu> SubMenus { get; set; }
+        public ICollection<SubMenu> SubMenus { get; set; }
     }
 }

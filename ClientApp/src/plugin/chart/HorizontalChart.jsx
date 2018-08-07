@@ -21,7 +21,6 @@ export default class HorizontalChart extends React.Component {
     render() {
         return (
             <div>
-                <h2>Horizontal Bar Example</h2>
                 <HorizontalBar data={data} />
             </div>
         );

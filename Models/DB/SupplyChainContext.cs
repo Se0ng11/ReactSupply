@@ -14,6 +14,8 @@ namespace ReactSupply.Models.DB
         public virtual DbSet<Setting> Setting { get; set; }
         public virtual DbSet<Tracker> Tracker { get; set; }
         public virtual DbSet<MainProduct> MainProduct { get; set; }
+        public virtual DbSet<LineProduct> LineProduct { get; set; }
+        public virtual DbSet<RolesMenu> RolesMenu { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -90,9 +92,8 @@ namespace ReactSupply.Models.DB
 
                 entity.Property(e => e.ValueName).HasMaxLength(50);
 
-                entity.Property(e => e.AxNumber)
-                    .IsRequired()
-                    .HasMaxLength(20);
+                entity.Property(e => e.Identifier)
+                    .IsRequired();
 
                 entity.Property(e => e.CreatedBy)
                     .HasMaxLength(30)
@@ -107,10 +108,6 @@ namespace ReactSupply.Models.DB
                     .HasDefaultValueSql("(suser_name())");
 
                 entity.Property(e => e.ModifiedDate).HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.Status)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
             });
 
 
@@ -138,11 +135,6 @@ namespace ReactSupply.Models.DB
                 entity.Property(e => e.Position).HasColumnType("decimal(4, 2)");
             });
 
-            modelBuilder.Entity<SubMenu>().HasOne(p => p.Menu)
-                .WithMany(b => b.SubMenus)
-                .HasForeignKey(p => p.MenuCode)
-                .HasConstraintName("ForeignKey_Menu_SubMenu");
-
             modelBuilder.Entity<History>(entity =>
             {
                 entity.HasKey(e => new { e.Id, e.ModuleId, e.Identifier });
@@ -157,25 +149,28 @@ namespace ReactSupply.Models.DB
 
             modelBuilder.Entity<Tracker>(entity =>
             {
-                entity.HasKey(e => new { e.TargetField, e.AffectField });
+                entity.HasKey(e => new { e.AffectField });
             });
-
 
             modelBuilder.Entity<MainProduct>(entity =>
             {
                 entity.HasKey(e => new { e.Identifier });
                 entity.Property(e => e.Id).ValueGeneratedOnAdd().Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
-                entity.Property(e => e.ModifiedBy)
-               .HasMaxLength(30)
-               .HasDefaultValueSql("(suser_name())");
+            });
 
-                entity.Property(e => e.ModifiedDate).HasDefaultValueSql("(getdate())");
+            modelBuilder.Entity<MainProduct>().HasMany(b => b.LineProduct).WithOne(p => p.MainProduct)
+            .HasForeignKey(p => p.Parent)
+            .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.CreatedBy)
-               .HasMaxLength(30)
-               .HasDefaultValueSql("(suser_name())");
+            modelBuilder.Entity<LineProduct>(entity =>
+            {
+                entity.HasKey(e => new { e.Identifier });
+                entity.Property(e => e.Id).ValueGeneratedOnAdd().Metadata.AfterSaveBehavior = PropertySaveBehavior.Ignore;
+            });
 
-                entity.Property(e => e.CreatedDate).HasDefaultValueSql("(getdate())");
+            modelBuilder.Entity<RolesMenu>(entity =>
+            {
+                entity.HasKey(e => new { e.RolesId, e.MenuId });
             });
         }
     }

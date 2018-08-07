@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+//import axios from 'axios';
+//import { toast } from 'react-toastify';
 import Card from '../../plugin//card/Card';
 import Container from '../../plugin/container/Container';
 import { Grid, Row, Col } from 'react-bootstrap';
@@ -41,6 +41,7 @@ export class Home extends Component {
 
 
     render() {
+
         return (
             <Grid fluid>
                 <Row>
@@ -54,18 +55,18 @@ export class Home extends Component {
                         <Card name="HotBox" value="19" color="yellow" icon="cube" />
                     </Col>
                     <Col xs={6} md={3}>
-                        <Card name="Pm Delay case" value="10" color="red" icon="clock-o" />
+                        <Card name="PM Delay" value="10" color="red" icon="clock-o" />
                     </Col>
                 </Row>
 
                 <Row>
-                    <Col xs="12" md="6">
-                        <Container>
+                    <Col xs={12} md={6}>
+                        <Container isMinimize={true} fixed={true} title="Line Sample">
                             <LineChart />
                         </Container>
                     </Col>
-                    <Col xs="12" md="6">
-                        <Container>
+                    <Col xs={12} md={6}>
+                        <Container isMinimize={true} fixed={true} title="Horizontal bar Sample">
                             <HorizontalChart />
                         </Container>
                     </Col>

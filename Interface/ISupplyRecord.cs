@@ -7,6 +7,6 @@ namespace ReactSupply.Interface
 {
     public interface ISupplyRecord
     {
-        Task<string> SelectMenuData(string menu);
+        Task<string> SelectMenuData(string menu, string updated);
     }
 }

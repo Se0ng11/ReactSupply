@@ -9,7 +9,7 @@ export class Summary extends Component {
                 <ReactGrids
                     headerRowHeight={90}
                     getApi="api/Home/GetSupplyRecord"
-                    postApi="api/Home/PostSupplyRecords"
+                    postApi=""
                     isGroupButton={false}
                     isHistoryEnabled={false}
                 />

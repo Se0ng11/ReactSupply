@@ -1,30 +1,28 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
-using System.Collections.Generic;
 
 namespace ReactSupply.Migrations
 {
-    public partial class Tracker : Migration
+    public partial class RolesMenu : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Tracker",
+                name: "RolesMenu",
                 columns: table => new
                 {
-                    AffectField = table.Column<string>(nullable: false),
-                    TotalDay = table.Column<int>(nullable: false)
+                    RolesId = table.Column<string>(nullable: false),
+                    MenuId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tracker", x => new { x.AffectField });
+                    table.PrimaryKey("PK_RolesMenu", x => new { x.RolesId, x.MenuId });
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Tracker");
+                name: "RolesMenu");
         }
     }
 }

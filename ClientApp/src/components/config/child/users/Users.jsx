@@ -46,14 +46,14 @@ export class Users extends React.Component {
     onClickToggleUserModal = (flag) => {
         this.setState({
             isUserModal: flag,
-            refreshGrid: flag
+            refreshGrid: !flag
         });
     }
 
     onClickToggleRoleModal = (flag) => {
         this.setState({
             isRoleModal: flag,
-            refreshGrid: flag
+            refreshGrid: !flag
         });
     }
 

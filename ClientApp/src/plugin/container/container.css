@@ -4,6 +4,41 @@
     border: 1px solid lightgrey;
     border-radius: 5px;
     box-shadow: 0 0 20px 0;
-    padding:30px;
-    min-height:400px;
+    padding:25px;
+    margin-bottom: 20px;
+
 }
+    .container-border.fixed {
+        height: 100%;
+    }
+
+    .container-border .top-right {
+        position: absolute;
+        right: 30px;
+        top: 10px;
+    }
+
+    .container-border .search-title {
+        font-size: 20px;
+        position: absolute;
+        left: 30px;
+        top: 10px;
+        font-weight: bold;
+    }
+
+    .container-border.search-open {
+        height: 100%;
+    }
+
+        .container-border.search-open .content {
+            display: block;
+
+        }
+
+    .container-border.search-close {
+        height: 0;
+    }
+
+        .container-border.search-close .content {
+            display: none;
+        }

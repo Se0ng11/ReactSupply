@@ -60,7 +60,7 @@ export default class Top extends React.Component {
                 <Navbar fluid collapseOnSelect fixedTop className="shadow">
                     <Navbar.Header>
                         <Navbar.Brand>
-                            <Link to="/Home">Sample</Link>
+                            <Link to="/Home">SCM</Link>
                         </Navbar.Brand>
                         <Navbar.Toggle />
                     </Navbar.Header>

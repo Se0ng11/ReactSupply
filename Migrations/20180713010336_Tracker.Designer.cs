@@ -210,7 +210,7 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
-                    b.Property<string>("AxNumber")
+                    b.Property<string>("Identifier")
                         .IsRequired()
                         .HasMaxLength(20);
 
@@ -246,13 +246,11 @@ namespace ReactSupply.Migrations
 
             modelBuilder.Entity("ReactSupply.Models.DB.Tracker", b =>
                 {
-                    b.Property<string>("TargetField");
-
                     b.Property<string>("AffectField");
 
                     b.Property<int>("TotalDay");
 
-                    b.HasKey("TargetField", "AffectField");
+                    b.HasKey("AffectField");
 
                     b.ToTable("Tracker");
                 });

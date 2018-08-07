@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 using NLog;
 using ReactSupply.Models.DB;
 using ReactSupply.Models.Entity;
+using System.Linq;
+using System.Collections.Generic;
+
 
 namespace ReactSupply.Logic
 {
@@ -35,6 +38,10 @@ namespace ReactSupply.Logic
             };
         }
 
+        public string SingleValuePair(List<ValuePair> vp, string name)
+        {
+            return vp.Where(x => x.Name == name).Select(x => x.Value).SingleOrDefault();
+        }
     }
 
    

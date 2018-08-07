@@ -46,13 +46,15 @@ namespace ReactSupply.Logic
                         {
                             key = x.Name,
                             name = x.Name,
-                            width = 400,
+                            width = 250,
                             locked = (showCol.Contains(x.Name)) ? true : false,
                             sortable = true,
                             editable = (showCol.Contains(x.Name)) ? false : true,
                             filterable = true,
                             resizable = true,
-                            control = x.PropertyType.Name
+                            control = x.PropertyType.Name,
+                            headerClass = "left-align",
+                            cellClass = "left-align"
                         }).ToList();
 
                 lst.Insert(0, FixedIndexColumn());
@@ -61,13 +63,15 @@ namespace ReactSupply.Logic
                 {
                     key = "Role",
                     name = "Role",
-                    width = 300,
+                    width = 200,
                     locked = false,
                     sortable = true,
                     editable = true,
                     filterable = true,
                     resizable = true,
-                    control = "role"
+                    control = "role",
+                    headerClass = "left-align",
+                    cellClass = "left-align"
                 };
 
                 lst.Add(roleCol);
@@ -82,7 +86,9 @@ namespace ReactSupply.Logic
                     editable = true,
                     filterable = true,
                     resizable = true,
-                    control = "boolean"
+                    control = "boolean",
+                    headerClass = "left-align",
+                    cellClass = "left-align"
                 };
                 lst.Add(isLockedCol);
             }

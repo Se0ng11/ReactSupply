@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace ReactSupply.Models.DB
         public string Url { get; set; }
         public bool IsEnabled { get; set; }
 
+        [ForeignKey("MenuCode")]
         public Menu Menu { get; set; }
     }
 }

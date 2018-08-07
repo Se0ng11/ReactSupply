@@ -10,6 +10,10 @@
 
 }
 
+.rdg-child-cell {
+    background: #d6f0fd !important;
+}
+
 .react-grid-HeaderCell { /*, .react-grid-Cell--locked {*/
     background: steelblue !important;
     color: #fff !important;
@@ -21,6 +25,10 @@
 
 .left-align {
     text-align:left !important;
+}
+
+.right-align {
+    text-align: right !important;
 }
 
 .drag-handle {
@@ -129,3 +137,22 @@
 .false {
     color: red;
 }
+
+[title="Delay"] {
+    color: red;
+    font-weight: bold;
+}
+
+[title="On Time"] {
+    color: green;
+    font-style: italic;
+}
+
+.checkbox-group {
+    border: 1px solid lightgrey;
+    padding :2px;
+    border-radius: 5px;
+}
+    .checkbox-group .title{
+        font-weight:bold;
+    }

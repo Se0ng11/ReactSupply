@@ -4,12 +4,14 @@ import ReactDataGrid, { Row, Cell } from 'react-data-grid';
 import axios from 'axios';
 import update from 'immutability-helper';
 import PropTypes from 'prop-types';
+import moment from 'moment';
+import Container from '../container/Container';
+import Loader from '../loader/Loader';
 import { DatePickerEditor } from './Editors';
 import { BooleanFormatter, DateFormatter, EmptyRowFormatter, HistoryModal, GroupModal } from './Formatter';
-import Loader from '../loader/Loader';
 import { CsvButton } from './Button';
 import { toast } from 'react-toastify';
-import moment from 'moment';
+
 
 const { Toolbar, Editors,  Filters: { NumericFilter, AutoCompleteFilter, MultiSelectFilter, SingleSelectFilter, DateFilter }, Data: { Selectors } } = require('react-data-grid-addons');
 //Formatters,
@@ -32,16 +34,20 @@ export default class ReactGrids extends Component {
     constructor(props, context) {
         super(props, context);
 
+        let realHeight = this.calculatePageHeight() - 220;
+
         this.state = {
+            expanded: {},
             header: [],
             rows: [],   
+            raw:[],
             filters: {},
             sortColumn: null,
             sortDirection: null,
             cellCss: "",
             cellRow: null,
             cellCol: null,
-            height: window.screen.availHeight - 250,
+            height: realHeight,
             isHistoryModal: false,
             isGroupModal: false,
             isGroupClicked: false,
@@ -55,18 +61,30 @@ export default class ReactGrids extends Component {
                 body: []
             }
         };
-
         //this.onClickShowModal = this.onClickShowModal.bind(this);
+    }
+
+    calculatePageHeight = () => {
+        let body = document.body,
+            html = document.documentElement;
+
+        let height = Math.max(body.scrollHeight, body.offsetHeight,
+            html.clientHeight, html.scrollHeight, html.offsetHeight);
+
+        return height;
     }
 
     componentDidMount() {
         this.onLoad();
+        this.setState({
+            isLoading: true
+        });
     }
 
     componentWillReceiveProps = (props) => {
 
-        if (this.props.refreshGrid) {
-            this.onLoad();
+        if (props.refreshGrid && !this.state.isLoading) {
+            this.onLoad(props.parameters);
         }
     }
 
@@ -146,7 +164,7 @@ export default class ReactGrids extends Component {
                     if (data.Status === "SUCCESS") {
                         self.setState({ cellCss: "border-success" });
                     } else {
-                        toast.error(data.Result);
+                        toast.error(data.Data);
                         self.setState({ cellCss: "border-failed" });
                     }
                 })
@@ -266,18 +284,22 @@ export default class ReactGrids extends Component {
             ary.getRowMetaData = (row) => row;
             ary.formatter = <DateFormatter />;
         }
-        
 
         return ary.formatter;
     }
 
-    onLoad = () => {
+    onLoad = (param) => {
         let self = this;
-        self.setState({isLoading: true});
+
+        self.setState({
+            isLoading: true,
+            expanded: {}
+        });
         axios.get(self.props.getApi,
             {
                 params: {
-                    identifier: localStorage.getItem("currentMenu")
+                    identifier: localStorage.getItem("currentMenu"),
+                    updated: param
                 },
                 cancelToken: new CancelToken(function executor(c) {
                     cancel = c;
@@ -290,10 +312,22 @@ export default class ReactGrids extends Component {
                 if (obj.Body !== "") {
                     _rows = JSON.parse(obj.Body);
 
+                    self.setState({ raw: _rows });
+
+                    _rows = self.splitParentChild(_rows);
+
                     for (let i = 0; i <= _rows.length - 1; i++) {
                         _rows[i].No = i + 1;
                     }
+                    _rows.filter(x => x.children !== undefined).forEach((v, i) => {
+                        let child = v.children;
+
+                        for (let x = 0; x <= child.length - 1; x++) {
+                            child[x].No = v.No + "." + (x+1);
+                        }
+                    });
                 }
+
                 self.setState({
                     header: _header,
                     rows: _rows,
@@ -309,6 +343,23 @@ export default class ReactGrids extends Component {
                 }
             });
 
+    }
+
+    splitParentChild = (rows) => {
+        let parents = rows.filter(x => x.Parent === undefined);
+        const childs = rows.filter(x => x.Parent !== undefined);
+        const unique = [...new Set(childs.map(x => x.Parent))];
+        for (var i = 0; i <= unique.length - 1; i++) {
+            parents = this.createChild(parents, childs, unique[i]);
+        }
+        return parents;
+    }
+
+    createChild = (parents, childs, unique) => {
+        let currentRow = parents.find(x => x.Identifier === unique);
+
+        currentRow.children = childs.filter(x => x.Parent === unique);
+        return parents;
     }
 
     onDoubleClick = (rowIdx, row, column) => {
@@ -329,13 +380,13 @@ export default class ReactGrids extends Component {
             ).then((response) => {
                 let obj = JSON.parse(response.data);
                 let _header = JSON.parse(obj.Header);
-                let _rows = "";
+                let _body = "";
 
                 if (obj.Body !== "") {
-                    _rows = JSON.parse(obj.Body);
-                    for (let i = 0; i <= _rows.length - 1; i++) {
-                        _rows[i].No = i + 1;
-                        _rows[i].CreatedDate = moment(_rows[i].CreatedDate).format("DD/MM/YYYY hh:mm A");
+                    _body = JSON.parse(obj.Body);
+                    for (let i = 0; i <= _body.length - 1; i++) {
+                        _body[i].No = i + 1;
+                        _body[i].CreatedDate = moment(_body[i].CreatedDate).format("DD/MM/YYYY hh:mm A");
                     }
                 }
 
@@ -343,7 +394,7 @@ export default class ReactGrids extends Component {
                     isHistoryModal: true,
                     historyData: {
                         header: _header,
-                        body: _rows
+                        body: _body
                     }
                 });
 
@@ -373,18 +424,19 @@ export default class ReactGrids extends Component {
                     header: ary,
                     body: row
                 },
-                isGroupClicked: true
+                isGroupClicked: ((row.children !== undefined || row.Parent !== undefined) && (row.ContainerTruckOutStatus === undefined || row.ContainerTruckOutStatus === "")) ? true: false
             })
         }
     }
 
+    //Group Button
     onGroupButtonClick = () => {
         this.setState({
             isGroupModal: true
         });
     }
 
-    onGroupCloseRefresh = (refresh) => {
+    onGroupCloseRefresh = (refresh, identifier, updated, child) => {
         let self = this;
 
         self.setState({
@@ -393,10 +445,83 @@ export default class ReactGrids extends Component {
         });
 
         if (refresh) {
-            self.onLoad();
+            let rows = self.state.rows;
+            let affectedRow = "";
+
+            if (child.length > 0) {
+
+                for (var i = 0; i <= child.length - 1; i++) {
+                    self.updateChild(self, identifier, updated, rows, child[i]);
+                }
+            } else {
+                affectedRow = rows.find(x => x.Identifier === identifier);
+                self.updateObject(affectedRow, updated);
+            }
+
         }
     }
 
+    updateChild = (self, identifier, updated, rows, child) => {
+     
+        let childRow = rows.find(x => x.Identifier === identifier).children.find(x => x.Identifier === child);
+        self.updateObject(childRow, updated);
+    }
+
+    updateObject = (obj, updated) => {
+        Object.keys(updated).forEach(function (key) {
+            if (updated[key] !== undefined) {
+                obj[key] = updated[key];
+            }
+        })
+        return obj;
+    }
+    //Group Button
+
+    //sub row
+    getSubRowDetails = (rowItem) => {
+
+        let isExpanded = this.state.expanded[rowItem.AXSO] ? this.state.expanded[rowItem.AXSO] : false;
+
+        return {
+            group: rowItem.children && rowItem.children.length > 0,
+            expanded: isExpanded,
+            children: rowItem.children,
+            field: 'AXSO',
+            treeDepth: rowItem.treeDepth || 0,
+            siblingIndex: rowItem.siblingIndex,
+            numberSiblings: rowItem.numberSiblings
+        };
+    }
+
+    onCellExpand = (args) => {
+        let rows = this.state.rows.slice(0);
+        let rowKey = args.rowData.Identifier;
+        let rowIndex = rows.indexOf(args.rowData);
+        let subRows = args.expandArgs.children;
+
+        let expanded = Object.assign({}, this.state.expanded);
+        if (expanded && !expanded[rowKey]) {
+            expanded[rowKey] = true;
+            this.updateSubRowDetails(subRows, args.expandArgs.treeDepth);
+            rows.splice(rowIndex + 1, 0, ...subRows);
+        } else if (expanded[rowKey]) {
+            expanded[rowKey] = false;
+            rows.splice(rowIndex + 1, subRows.length);
+        }
+
+        this.setState({ expanded: expanded, rows: rows });
+    }
+
+    updateSubRowDetails = (subRows, parentTreeDepth) => {
+        let treeDepth = parentTreeDepth || 0;
+        subRows.forEach((sr, i) => {
+            sr.treeDepth = treeDepth + 1;
+            sr.siblingIndex = i;
+            sr.numberSiblings = subRows.length;
+        });
+    };
+
+    //sub row
     ToolbarButton = () => {
 
         let isMatch = false;
@@ -421,12 +546,13 @@ export default class ReactGrids extends Component {
             <div>
                 <div className="grid-btn-right" >
                     {this.props.gridButton}
-                    <CsvButton header={this.state.header} body={this.state.rows} />
+                    <CsvButton header={this.state.header} body={this.state.raw} />
                 </div>
                 {
                     (this.props.isGroupButton && isMatch) &&
                     <button type="button" disabled={!this.state.isGroupClicked} className={roleColor} onClick={this.onGroupButtonClick}><i className="fa fa-pencil-square-o"></i> {role}</button>
                 }
+                <label>Total record(s): {this.state.raw.length}</label>
             </div>
         )
     }
@@ -438,9 +564,14 @@ export default class ReactGrids extends Component {
 
         if (apiData !== undefined && apiData.length >0) {
             apiData = this.renderStringToObject(apiData);
-
             return (
                 <div>
+                    {
+                        this.props.search !== undefined &&
+                        <Container title="Search" isMinimize={true}>
+                            {this.props.search}
+                        </Container>
+                    }
                     <RowContext.Provider value={this.state.cellRow}>
                         <ColContext.Provider value={this.state.cellCol}>
                             <ColorContext.Provider value={this.state.cellCss}>
@@ -462,6 +593,8 @@ export default class ReactGrids extends Component {
                                     onClearFilters={this.onClearFilters}
                                     emptyRowsView={EmptyRowFormatter}
                                     rowRenderer={RowRenderer}
+                                    getSubRowDetails={this.getSubRowDetails}
+                                    onCellExpand={this.onCellExpand}
                                 />
                             </ColorContext.Provider>
                         </ColContext.Provider>
@@ -498,7 +631,9 @@ ReactGrids.propTypes = {
     refreshGrid: PropTypes.bool,
     parentOptions: PropTypes.array,
     postApi: PropTypes.string,
-    identifier: PropTypes.func
+    identifier: PropTypes.func,
+    search: PropTypes.element,
+    parameters: PropTypes.string
 }
 
 class HeaderGroup extends Component {

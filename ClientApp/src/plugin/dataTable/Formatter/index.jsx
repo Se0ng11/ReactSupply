@@ -9,5 +9,5 @@ export {
     BooleanFormatter,
     EmptyRowFormatter,
     HistoryModal,
-    GroupModal
+    GroupModal,
 }

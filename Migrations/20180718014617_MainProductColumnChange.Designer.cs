@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReactSupply.Models.DB;
 
 namespace ReactSupply.Migrations
 {
     [DbContext(typeof(SupplyChainContext))]
-    partial class SupplyChainContextModelSnapshot : ModelSnapshot
+    [Migration("20180718014617_MainProductColumnChange")]
+    partial class MainProductColumnChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,7 +132,7 @@ namespace ReactSupply.Migrations
                     b.ToTable("History");
                 });
 
-            modelBuilder.Entity("ReactSupply.Models.DB.LineProduct", b =>
+            modelBuilder.Entity("ReactSupply.Models.DB.MainProduct", b =>
                 {
                     b.Property<string>("Identifier")
                         .ValueGeneratedOnAdd();
@@ -149,37 +151,7 @@ namespace ReactSupply.Migrations
 
                     b.Property<string>("Parent");
 
-                    b.Property<decimal>("Quantity");
-
-                    b.Property<DateTime?>("SODate");
-
-                    b.Property<string>("Size");
-
-                    b.HasKey("Identifier");
-
-                    b.HasIndex("Parent");
-
-                    b.ToTable("LineProduct");
-                });
-
-            modelBuilder.Entity("ReactSupply.Models.DB.MainProduct", b =>
-                {
-                    b.Property<string>("Identifier")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime?>("ActualDate");
-
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool?>("IsOnTime");
-
-                    b.Property<bool>("IsRecount");
-
-                    b.Property<DateTime?>("OriginalDate");
-
-                    b.Property<decimal>("Quantity");
+                    b.Property<int>("Quantity");
 
                     b.Property<DateTime?>("SODate");
 
@@ -211,17 +183,6 @@ namespace ReactSupply.Migrations
                     b.HasKey("MenuCode");
 
                     b.ToTable("Menu");
-                });
-
-            modelBuilder.Entity("ReactSupply.Models.DB.RolesMenu", b =>
-                {
-                    b.Property<string>("RolesId");
-
-                    b.Property<string>("MenuId");
-
-                    b.HasKey("RolesId", "MenuId");
-
-                    b.ToTable("RolesMenu");
                 });
 
             modelBuilder.Entity("ReactSupply.Models.DB.Setting", b =>
@@ -282,6 +243,10 @@ namespace ReactSupply.Migrations
                     b.Property<string>("ValueName")
                         .HasMaxLength(50);
 
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(20);
+
                     b.Property<string>("CreatedBy")
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("(suser_name())")
@@ -293,9 +258,6 @@ namespace ReactSupply.Migrations
 
                     b.Property<string>("Data")
                         .HasMaxLength(1000);
-
-                    b.Property<string>("Identifier")
-                        .IsRequired();
 
                     b.Property<string>("ModifiedBy")
                         .ValueGeneratedOnAdd()
@@ -313,8 +275,7 @@ namespace ReactSupply.Migrations
 
             modelBuilder.Entity("ReactSupply.Models.DB.Tracker", b =>
                 {
-                    b.Property<string>("AffectField")
-                        .ValueGeneratedOnAdd();
+                    b.Property<string>("AffectField");
 
                     b.Property<int>("TotalDay");
 
@@ -333,19 +294,12 @@ namespace ReactSupply.Migrations
                     b.ToTable("JSONResult");
                 });
 
-            modelBuilder.Entity("ReactSupply.Models.DB.LineProduct", b =>
-                {
-                    b.HasOne("ReactSupply.Models.DB.MainProduct", "MainProduct")
-                        .WithMany("LineProduct")
-                        .HasForeignKey("Parent")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("ReactSupply.Models.DB.SubMenu", b =>
                 {
                     b.HasOne("ReactSupply.Models.DB.Menu", "Menu")
                         .WithMany("SubMenus")
                         .HasForeignKey("MenuCode")
+                        .HasConstraintName("ForeignKey_Menu_SubMenu")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

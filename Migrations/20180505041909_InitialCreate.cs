@@ -53,7 +53,7 @@ namespace ReactSupply.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ModuleID = table.Column<int>(nullable: false, defaultValueSql: "((0))"),
                     ValueName = table.Column<string>(maxLength: 50, nullable: false),
-                    AxNumber = table.Column<string>(maxLength: 20, nullable: false),
+                    Identifier = table.Column<string>(maxLength: 20, nullable: false),
                     Data = table.Column<string>(maxLength: 1000, nullable: true),
                     ModifiedBy = table.Column<string>(maxLength: 30, nullable: true, defaultValueSql: "(suser_name())"),
                     ModifiedDate = table.Column<DateTime>(nullable: true, defaultValueSql: "(getdate())"),

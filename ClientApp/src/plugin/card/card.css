@@ -40,3 +40,28 @@
         font-weight: bold;
         font-size: 30px;
     }
+
+
+@media  (max-width : 480px) {
+    .white-card .icon {
+        position: absolute;
+        top: -20px;
+        border: 1px solid lightgrey;
+        background: green;
+        border-radius: 5px;
+        height: 70px;
+        width: 50%;
+        left: 30px;
+        opacity: 0.9;
+    }
+        .white-card .icon i {
+            color: #fff;
+            position: relative;
+            left: 20%;
+            top: 5%;
+        }
+
+        .white-card .header {
+            display: none;
+        }
+}

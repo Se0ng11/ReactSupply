@@ -41,7 +41,7 @@ namespace ReactSupply.Controllers
             var obj = new ConfigurationMainLogic(_context);
             var obj1 = new SupplyRecordLogic(_context);
             var data = obj.SelectHeader(Convert.ToInt32(modal.identifier), isGuest);
-            var data1 = obj1.SelectMenuData(modal.identifier);
+            var data1 = obj1.SelectMenuData(modal.identifier, modal.updated);
 
             await Task.WhenAll(data, data1);
 
@@ -100,7 +100,7 @@ namespace ReactSupply.Controllers
             else
             {
                 _responseMessage.Status = result.ToString();
-                _responseMessage.Data = Messages.SAVESUCCESS;
+                _responseMessage.Data = Messages.SAVEFAILED;
             }
 
             return Tools.ConvertToJSON(_responseMessage);

@@ -47,15 +47,17 @@ namespace ReactSupply.Logic
 
                     if (shadow.CurrentValue != null)
                     {
-                        if (shadow.CurrentValue.GetType().Name == "Boolean")
+                        var shadowName = shadow.CurrentValue.GetType().Name;
+
+                        if (shadowName == "Boolean")
                         {
                             shadow.CurrentValue = Convert.ToBoolean(oValue);
                         }
-                        else if (shadow.CurrentValue.GetType().Name == "Decimal")
+                        else if (shadowName == "Decimal")
                         {
                             shadow.CurrentValue = Convert.ToDecimal(oValue);
                         }
-                        else if (shadow.CurrentValue.GetType().Name == "Integer")
+                        else if (shadowName == "Integer" || shadowName == "Int32")
                         {
                             shadow.CurrentValue = Convert.ToInt32(oValue);
                         }

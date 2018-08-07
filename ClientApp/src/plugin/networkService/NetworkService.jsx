@@ -1,6 +1,9 @@
-﻿import axios from 'axios';
+﻿import React from 'react'
+import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 //let numberOfAjaxCAllPending = 0;
+let iRetry = 0;
 
 export default {
     setupRequestInterceptors: () => {
@@ -25,7 +28,10 @@ export default {
             if (error.response !== undefined) {
                 let erroResponse = error.response;
 
-                if (erroResponse.status === 401) {
+                if (erroResponse.status === 401 && iRetry <= 10) {
+
+                    iRetry += 1;
+
                     return axios.post('api/Token/RefreshToken', {
                         UserId: localStorage.getItem("user"),
                         Refresh: localStorage.getItem("refresh")
@@ -37,11 +43,15 @@ export default {
                             localStorage.setItem("token", result.Token);
                             localStorage.setItem("refresh", result.Refresh);
                             localStorage.setItem("user", result.UserId);
+                            iRetry = 0;
                         }
                         return axios(erroResponse.config);
                     }).catch(error => {
                         return Promise.reject(error);
                     });
+                } else {
+                    localStorage.clear();
+                    return <Redirect to='/auth' />
                 }
             }
             return Promise.reject(error);
